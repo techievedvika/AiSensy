@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import Logo from './Logo';
 
 const Navbar = () => {
   const[open,setOpen] = useState(false)
@@ -9,9 +10,7 @@ const Navbar = () => {
     <div className=" border  w-full sticky-top-0  bg-white bg-opacity-10  py-4 px-2 shadow-md ">
         <div className='  flex justify-around  '>
         <div className="logo ">
-            <Link to='/' className=''>
-            <img className='max-h-12  transition duration-150 hover:ease-out hover:opacity-85 ' src='https://unicorn-cdn.b-cdn.net/67244a6e-1849-42d1-ae59-0afc5948afa8/aisensy---whatsapp-marketing-platform-logo.png' alt='logo'/>
-            </Link>
+          <Logo/>
         </div>
         <button onClick={()=>setOpen(!open)} className=' transform duration-150 after:translate-x-1 lg:hidden text-xl w-10 h-10 rounded-full text-center flex items-center justify-center shadow-xl border '>
       
