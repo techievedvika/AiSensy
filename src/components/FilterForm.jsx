@@ -3,7 +3,7 @@ import { Formik, Form, Field, FieldArray } from 'formik';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 
-const FilterForm = (props) => {
+const FilterForm = () => {
     let optArr = ['Yes','No','All'];
     const atrValues = ['']
     const handleSubmit = ()=>{

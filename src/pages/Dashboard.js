@@ -1,10 +1,11 @@
 import React from 'react'
-import Sidebar from '../components/SidebarLg'
+import Sidebar from '../components/Sidebar'
 import { faBolt, faBookOpen, faCalendarDays, faCheck, faChevronDown, faChevronUp, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PhoneInput from 'react-phone-number-input';
+import Sidebtn from '../components/Sidebtn';
 
 const Dashboard = () => {
     const[showApiDetails,setShowApiDetails]=useState(true); //Toggle whatsapp Business APi button
@@ -14,14 +15,19 @@ const Dashboard = () => {
     const[showGreenTickDetails,setShowGreentick]=useState(false); // Toggle green tick button
     const[showSteps,setShowSteps]=useState(false); // Toggle steps button
     const[showTutorials,setShowtutorials]=useState(false);
+    const[showSidebar,setShowSidebar]=useState(false);
 	const [phone,setPhoneValue]=useState();
     return (
     <>
       <div className="grid grid-flow-row-dense grid-cols-12 ">
-        <div className='hidden lg:block '>
-            <Sidebar />
-        </div>
-        <div className="lg:col-span-11 col-span-12 border ">
+            <Sidebar 
+              show={showSidebar}
+              handleClose={()=>setShowSidebar(false)}
+            />
+        <div className={`lg:col-span-11 col-span-12 border ${showSidebar && 'hidden'}`}>
+          <Sidebtn
+            onShow={()=>setShowSidebar(!showSidebar)}
+          />
           {/* NAVBAR */}
           <div className="flex flex-col gap-3 lg:flex-row lg:justify-between p-4">
             <h5 className="">Vedvika Tech</h5>

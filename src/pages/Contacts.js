@@ -1,23 +1,29 @@
 import React, { useState } from 'react'
-import Sidebar from '../components/SidebarLg'
+import Sidebar from '../components/Sidebar'
 import { faBars, faBookOpen, faCircleExclamation, faMagnifyingGlass, faPlay } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import FilterForm from '../components/FilterForm'
+import Sidebtn from '../components/Sidebtn'
 
 const Contacts = () => {
     const[searchText,setSearchText]=useState('');
     const [action,setAction]=useState('');
     const[entries,setEntries]=useState('25 per page');
     const[showModal,setShowModal]=useState(false);
+    const[showSidebar,setShowSidebar]=useState(false);
     const actions=['Export','Import History','Manage Tags','block & Opt','Edit Contact'];
     const entriesArr = ['25 per page','50 per page','100 per page'];
     return (
     <div className="grid grid-flow-row-dense grid-cols-12 ">
-      <div className="hidden lg:block h-full">
-        <Sidebar />
-      </div>
-      <div className="lg:col-span-11 col-span-12  ">
+            <Sidebar 
+              show={showSidebar}
+              handleClose={()=>setShowSidebar(false)}
+            />
+      <div className={`lg:col-span-11 col-span-12  ${showSidebar && 'hidden'}`}>
+          <Sidebtn
+            onShow={()=>setShowSidebar(!showSidebar)}
+          />
         {/* NAVBAR */}
         <div className="flex bg-white border shadow-md  justify-between p-3 lg:px-6">
           <h3 className="text-xl">Contacts</h3>

@@ -1,16 +1,22 @@
 import React, { useState } from 'react'
-import Sidebar from '../components/SidebarLg'
+import Sidebar from '../components/Sidebar'
 import BtnGroup from '../components/BtnGroup'
 import ListMsg from '../components/ListMsg'
+import Sidebtn from '../components/Sidebtn'
 
 const Messages = () => {
-  const[msgType,setMsgType]=useState('plain')
+  const[msgType,setMsgType]=useState('plain');
+  const[showSidebar,setShowSidebar]=useState(false);
   return (
     <div className="grid grid-flow-row-dense grid-cols-12 ">
-      <div className="hidden lg:block h-full">
-        <Sidebar />
-      </div>
-      <div className="lg:col-span-11 col-span-12  ">
+        <Sidebar 
+              show={showSidebar}
+              handleClose={()=>setShowSidebar(false)}
+            />
+      <div className={`lg:col-span-11 col-span-12 border ${showSidebar && 'hidden'}`}>
+            <Sidebtn
+            onShow={()=>setShowSidebar(!showSidebar)}
+            />
         {/* Navbar */}
         <div className="flex bg-white border shadow-md  justify-between p-3 lg:px-6">
           <h3 className="text-xl"> Custom Messages</h3>
