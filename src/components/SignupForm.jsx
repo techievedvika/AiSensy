@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
+import httpReq from '../service/httpReq';
+import authService from '../service/authService';
 
 const SignupForm = () => {
     const[form,setForm]=useState({name:'',email:'',password:'',cpassword:'',mobile:''});
@@ -13,7 +15,7 @@ const SignupForm = () => {
     }
     //Email Validation using regex
     function isValidEmail(email){
-        const valid= /^[\w-\.]+@([\w-]+\.)+[\W-]{2,4}$/g;
+        const valid= /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return email.match(valid);
     }
     //Password validation
@@ -22,8 +24,9 @@ const SignupForm = () => {
             return 'Password is Required';
         }
         if(password.length<8) return 'Password should be atleast 8 characters long';
+        let str = 0;
         for(let p of password){
-            if(!(p>='A' && p<='Z') || !(p>='0' && p<='9') || !(p>='a' && p<='z')){
+            if(!((p>='A' && p<='Z') || (p>='0' && p<='9') || (p>='a' && p<='z'))){
                 return 'Password can only contain digits and alphabets'
             }
         }
@@ -32,6 +35,9 @@ const SignupForm = () => {
     //Mobile Number Validation
     function validateMob(mobile){
         if(!mobile) return 'Mobile Number is Required';
+        if(mobile.length!==10){
+          return 'Enter a valid mobile number';
+        }
         for(let p of mobile){
             if(!(p>='0' && p<='9')){
                 return 'Enter a valid mobile number';
@@ -43,17 +49,45 @@ const SignupForm = () => {
     const validate = ()=>{
         let err = {...errors};
         err.name = !form.name ? 'Name is Required':'';
-        err.email = !form.email ? 'Email is Required' : (isValidEmail(form.email)===true ? '':'Enter a valid email' ); 
+        err.email = !form.email ? 'Email is Required' : (isValidEmail(form.email) ? '':'Enter a valid email' ); 
         err.mobile = validateMob(form.mobile);
         err.password = validatePass(form.password);
         err.cpassword=form.password===form.cpassword ? '':'Passwords do not match';
-        setErrors(err);
-        //console.log(errors);
+        return err;
+    
+    }
+    const isValid =(errors)=>{
+      let keys = Object.keys(errors);
+      let count =keys.reduce((acc,curr)=>errors[curr] ?acc+1:acc,0);
+      return count===0;
+    }
+    const postData = async(obj,url)=>{
+      try{
+        let res = await httpReq.post(url,obj);
+        //console.log(res.data);
+        authService.login(res.data);
+        window.location = '/dashboard';
+      }catch(err){
+        console.log(err);
+        if(err && err.response && err.response.status===400){
+          // let errr = {...errors};
+          // errr.server = err.response.data;
+          // setErrors(errr);
+          alert(err.response.data);
+        }
+      }
     }
     const handleSubmit = ()=>{
-        validate();
+        let errors = validate();
         //Check if any errors
-        
+        if(isValid(errors)){
+          setErrors({});
+          let user = {name:form.name,email:form.email,password:form.password,mobile:form.mobile};
+          postData(user,'/register');
+          //alert('Submitted!!!')
+        }else{
+          setErrors(errors);
+        }
     }
     
   return (
@@ -115,6 +149,7 @@ const SignupForm = () => {
        />
        {errors && errors.cpassword && <span className=' text-red-600 text-sm'>{errors.cpassword}</span>}
     </div>
+  
     <div className="">
      <button onClick={()=>handleSubmit()} className={`w-full rounded-lg text-white font-medium py-2 text-lg bg-[#0a474c] hover:bg-[#063338] disabled:bg-[#e0e0e0] disabled:text-gray-400 `}>Start Your FREE Trial</button>
     </div>

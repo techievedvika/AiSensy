@@ -6,6 +6,27 @@ import { faArrowRight, faHeart } from '@fortawesome/free-solid-svg-icons'
 import Footer from '../components/Footer'
 
 const Home = () => {
+    const founderMarketerLinks = [
+        'https://unicorn-cdn.b-cdn.net/740001d6-e384-44a4-a0d1-e2a4302375ad/cosco.png',
+        'https://unicorn-cdn.b-cdn.net/b52c0b16-53ae-4805-811e-bd3d75b28fbc/-/crop/2433x715/0,258/-/preview/skullcandy-logo.png',
+        'https://unicorn-cdn.b-cdn.net/0f518097-daba-4a36-948a-feb12fb0e866/2560px-vivo-logo-2019.svg.png',
+        'https://unicorn-cdn.b-cdn.net/f2fdb291-9707-49af-b1cb-a75772d6b355/bsc-logo-155x.png',
+        'https://unicorn-cdn.b-cdn.net/37e02314-377b-417a-8e5a-8b5da441a51c/nmims-university-logo-(2)-(1).png',
+        'https://unicorn-cdn.b-cdn.net/651167a1-6c5e-4486-a5ff-ee749b2c3c6b/download-(2).png',
+        'https://unicorn-cdn.b-cdn.net/bedd7212-5949-4834-8f64-d94b6de3fc72/rentomojo-logo.png',
+        'https://unicorn-cdn.b-cdn.net/c988bf13-03d7-4733-8218-2703bdfd8e86/-/crop/900x135/0,369/-/preview/tata-motorfinance.png',
+        'https://unicorn-cdn.b-cdn.net/db1aed86-0976-47bb-a5ad-8ec3d446f216/image.png?width=81&height=34',
+        'https://unicorn-cdn.b-cdn.net/91ed2ee3-ee55-404a-b96d-84e962e55f5b/quikr.png?width=73&height=28',
+        'https://unicorn-cdn.b-cdn.net/2d4bdf49-94dd-4a86-a73d-5bd5cf3b1132/isckon-1.png?width=47&height=43',
+        'https://unicorn-cdn.b-cdn.net/8175f95a-70b3-442d-96c8-4b0ddf7e72d7/image-216.png?width=60&height=60',
+        'https://unicorn-cdn.b-cdn.net/3b9e28de-f8ff-42ac-b269-e394ec671d7a/upgrad-1.png?width=88&height=22',
+        'https://unicorn-cdn.b-cdn.net/7bd8d414-ce15-4d8c-9c7a-4de63629ece5/image-143.png?width=101&height=26',
+        'https://unicorn-cdn.b-cdn.net/9b15e1e6-e98b-4d15-85a9-d5e91cc2fabb/sibmb1-1.png?width=92&height=34',
+        'https://unicorn-cdn.b-cdn.net/651167a1-6c5e-4486-a5ff-ee749b2c3c6b/download-(2).png',
+        'https://unicorn-cdn.b-cdn.net/65aab9dc-a46f-468a-833b-cfd14e2c936e/image-210.png?width=74&height=46',
+        'https://unicorn-cdn.b-cdn.net/683afe88-b5ce-4e88-a4d4-4b2811aa0200/growthx-india-logo-1.png?width=101&height=36',
+        'https://unicorn-cdn.b-cdn.net/f31048cf-f259-4cbd-85e5-e7370c127c6a/stayvista.png?width=54&height=39'
+    ]
   return (
     <>
         <Navbar/>
@@ -41,67 +62,13 @@ const Home = () => {
                 <div className='text-lg text-slate-800 my-2 mb-8 '>Join thousands of AiSensy Business Today</div>
                 <div className='flex justify-center'>
 
-                    <div className='grid grid-cols-3 justify-around gap-2 lg:grid-cols-5 self-center px-12'>
-                        <Link to='/'>
-                            <img className='max-h-16 max-w-24' src='https://unicorn-cdn.b-cdn.net/740001d6-e384-44a4-a0d1-e2a4302375ad/cosco.png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-16 max-w-28' src='https://unicorn-cdn.b-cdn.net/b52c0b16-53ae-4805-811e-bd3d75b28fbc/-/crop/2433x715/0,258/-/preview/skullcandy-logo.png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/0f518097-daba-4a36-948a-feb12fb0e866/2560px-vivo-logo-2019.svg.png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/f2fdb291-9707-49af-b1cb-a75772d6b355/bsc-logo-155x.png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/37e02314-377b-417a-8e5a-8b5da441a51c/nmims-university-logo-(2)-(1).png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/651167a1-6c5e-4486-a5ff-ee749b2c3c6b/download-(2).png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/bedd7212-5949-4834-8f64-d94b6de3fc72/rentomojo-logo.png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/c988bf13-03d7-4733-8218-2703bdfd8e86/-/crop/900x135/0,369/-/preview/tata-motorfinance.png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/db1aed86-0976-47bb-a5ad-8ec3d446f216/image.png?width=81&height=34'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/91ed2ee3-ee55-404a-b96d-84e962e55f5b/quikr.png?width=73&height=28'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/2d4bdf49-94dd-4a86-a73d-5bd5cf3b1132/isckon-1.png?width=47&height=43'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/8175f95a-70b3-442d-96c8-4b0ddf7e72d7/image-216.png?width=60&height=60'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/3b9e28de-f8ff-42ac-b269-e394ec671d7a/upgrad-1.png?width=88&height=22'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/7bd8d414-ce15-4d8c-9c7a-4de63629ece5/image-143.png?width=101&height=26'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/9b15e1e6-e98b-4d15-85a9-d5e91cc2fabb/sibmb1-1.png?width=92&height=34'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/651167a1-6c5e-4486-a5ff-ee749b2c3c6b/download-(2).png'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/65aab9dc-a46f-468a-833b-cfd14e2c936e/image-210.png?width=74&height=46'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/683afe88-b5ce-4e88-a4d4-4b2811aa0200/growthx-india-logo-1.png?width=101&height=36'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/6c5b6ef6-2da9-47c9-941c-016e9f2a50c9/emudhra-1.png?width=124&height=34'/>
-                        </Link>
-                        <Link to='/'>
-                            <img className='max-h-12 max-w-20' src='https://unicorn-cdn.b-cdn.net/f31048cf-f259-4cbd-85e5-e7370c127c6a/stayvista.png?width=54&height=39'/>
-                        </Link>
+                    <div className='grid grid-cols-3 my-4 justify-center items-center gap-4 lg:grid-cols-5 self-center px-12 '>
+                        {founderMarketerLinks.map((a,ind)=>(
+                            <Link to='/' key={ind}>
+                            <img className='max-h-16 max-w-24' src={a}/>
+                            </Link>
+                        ))}
+                        
                     </div>
                 </div>
             </div>
@@ -333,7 +300,6 @@ const Home = () => {
                 </div>
             </div>
             <Footer/>
-
         </div>
     </>
   )

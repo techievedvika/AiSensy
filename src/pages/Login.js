@@ -31,7 +31,9 @@ const Login = () => {
                     alt="logo"
                   />
                 </Link>
-                <div className='text-right text-slate-500'>Not a member yet ? <Link className='text-blue-800' to='/signup'>Sign up</Link></div>
+                <div className='text-right text-slate-500'>Not a member yet ? 
+                  <Link className='text-blue-800' to='/pricing'>Sign up</Link>
+                </div>
                 <div className='px-16 py-5'>
                   <h4 className='text-md my-2 mt-5 text-slate-500'>WELCOME BACK</h4>
                   <h3 className='text-3xl tracking-wide font-semibold'>Log in to AiSensy</h3>

@@ -1,10 +1,62 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { Link } from 'react-router-dom'
 import Sidebtn from '../components/Sidebtn';
+import httpReq from '../service/httpReq';
+import authService from '../service/authService';
 
 const EditProfile = () => {
     const[showSidebar,setShowSidebar]=useState(false);
+    const [form,setForm] = useState({name:'',email:'',mobile:'',address:''});
+    const [pform,setPform] = useState({password:'',newpassword:'',confirmpassword:''})
+    const user = authService.getUser();
+    // console.log(user);
+    // console.log(user?._id);
+    // console.log(user.name);
+    useEffect(()=>{
+        const fetchData = async() =>{
+            try{
+               
+                 let res = await httpReq.get(`/getuser/${user._id}`);
+                 //console.log(res.data);
+                 setForm(res.data);
+                 //console.log(form);
+            }catch(err){
+                console.log(err);
+            }
+        };
+        fetchData();
+    },[]);
+    const putData = async(url,obj)=>{
+        try{
+            let res = await httpReq.put(url,obj);
+            if(res.status===201){
+                console.log(res.status);
+                //fetchData();
+            }
+            //console.log(res);
+        }catch(err){
+            console.log(err);
+        }
+    }
+    const handleChange =(e)=>{
+        let {name,value}=e.target;
+        let userform ={...form};
+        userform[name]=value;
+        setForm(userform);
+    }
+    const handleSubmit = ()=>{
+        putData(`/editprofile/${user._id}`,form);
+    }
+    const handlepchange =(e)=>{
+        let {name,value}=e.target;
+        let p1 = {...pform};
+        p1[name]=value;
+        setPform(p1);
+    }
+    const handlePSubmit = ()=>{
+        putData(`/editprofile/password/${user._id}`,pform);
+    }
   return (
       <div className="grid grid-flow-row-dense grid-cols-12 ">
           <Sidebar 
@@ -34,22 +86,39 @@ const EditProfile = () => {
                         {/* Name */}
                         <div className='my-2'>
                             <label className='text-slate-500 my-2 font-semibold'>Name</label>
-                            <input type='text' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
+                            <input
+                                name='name' 
+                                value={form.name}
+                                onChange={handleChange}
+                                type='text' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
                         </div>
                         {/* Email */}
                         <div className='my-2'>
-                            <label className='text-slate-500 my-2 font-semibold'>Email</label>
-                            <input type='email' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
+                            <label 
+                            className='text-slate-500 my-2 font-semibold'>Email</label>
+                            <input 
+                             name='email' 
+                            value={form.email}
+                            onChange={handleChange}
+                            type='email' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
                         </div>
                         {/* Phone */}
                         <div className='my-2'>
                             <label className='text-slate-500 my-2 font-semibold'>Phone</label>
-                            <input type='number' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
+                            <input
+                            name='mobile'
+                            value={form.mobile}
+                            onChange={handleChange} 
+                            type='number' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
                         </div>
                         {/* Address */}
                         <div className='my-2'>
                             <label className='text-slate-500 my-2 font-semibold'>Address <span className='text-sm'>(will be used for invoice)</span></label>
-                            <input type='text' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
+                            <input
+                            name='address'
+                            value={form.address}
+                            onChange={handleChange} 
+                            type='text' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
                         </div>
                         {/* Image */}
                         <div className='my-2'>
@@ -58,7 +127,7 @@ const EditProfile = () => {
                             <input type='file' className='bg-[#f7f7f7] mt-2   my-1 rounded-md '/>
                         </div>
                         {/* Submit */}
-                        <button className='p-2 my-4 text-sm border border-[#0a474c] font-medium text-[#0a474c] mt-8 hover:text-white rounded-md hover:bg-[#0a474c]'>Update Settings</button>
+                        <button onClick={()=>handleSubmit()} className='p-2 my-4 text-sm border border-[#0a474c] font-medium text-[#0a474c] mt-8 hover:text-white rounded-md hover:bg-[#0a474c]'>Update Settings</button>
                     </div>
                 </div>
                 {/* Password Update */}
@@ -72,21 +141,38 @@ const EditProfile = () => {
                         {/* Old Password */}
                         <div className='my-2'>
                             <label className='text-slate-500 my-2 font-semibold'>Old Password</label>
-                            <input type='password' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
+                            <input 
+                            name='password'
+                            value={pform.password}
+                            onChange={handlepchange}  
+                            type='password'
+                            required  
+                            className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
                         </div>
                         {/* New Password */}
                         <div className='my-2'>
                             <label className='text-slate-500 my-2 font-semibold'>New Password</label>
-                            <input type='password' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
+                            <input
+                            name='newpassword'
+                            value={pform.newpassword}
+                            onChange={handlepchange}
+                            required    
+                            type='password' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
                         </div>
                         {/* Confirm Password */}
                         <div className='my-2'>
                             <label className='text-slate-500 my-2 font-semibold'>Confirm Password</label>
-                            <input type='password' className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
+                            <input
+                            name='confirmpassword'
+                            value={pform.confirmpassword}
+                            onChange={handlepchange}   
+                            type='password'
+                            required 
+                            className='bg-[#f7f7f7] mt-2 border py-1.5 my-1 rounded-md w-full'/>
                         </div>
                         
                         {/* Submit */}
-                        <button className='p-2 my-4 text-sm border border-[#0a474c] font-medium text-[#0a474c] mt-8 hover:text-white rounded-md hover:bg-[#0a474c]'>Update Password</button>
+                        <button onClick={()=>handlePSubmit()} className='p-2 my-4 text-sm border border-[#0a474c] font-medium text-[#0a474c] mt-8 hover:text-white rounded-md hover:bg-[#0a474c]'>Update Password</button>
                     </div>
                 </div>
               </div>  

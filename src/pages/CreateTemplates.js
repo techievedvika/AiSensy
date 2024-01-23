@@ -5,12 +5,115 @@ import ListMsg from '../components/ListMsg'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
-import Sidebtn from '../components/Sidebtn'
+import Sidebtn from '../components/Sidebtn';
+import authService from '../service/authService'
+import httpReq from '../service/httpReq'
+import { useEffect } from 'react'
 
-const CreateTemplates = () => {
-    const[msgType,setMsgType]=useState('plain');
-    const[showSidebar,setShowSidebar]=useState(false);
 
+const CreateTemplates = (props) => {
+  let {id}=props.match.params;
+  const[msgType,setMsgType]=useState('plain');
+  const user =authService.getUser();
+  const[form,setForm]=useState({
+    name:'',
+    text:'',
+    type:msgType,
+    user:user ? user._id :''
+  });
+  const[errors,setErrors]=useState({});
+  const[showSidebar,setShowSidebar]=useState(false);
+  const fetchData = async()=>{
+    try{
+      let response = await httpReq.get(`/template/${id}`);
+      console.log(response);
+      if(response.status===200){
+        setForm(response.data);
+      }
+    }catch(err){
+      console.log(err)
+      if(err.response.status===404){
+        alert(err.response.data.message);
+      }
+    }
+  }
+  useEffect(()=>{
+    if(id){
+      fetchData();
+    }
+  },[]);
+  const handleChange = (e)=>{
+    let {name,value}=e.target;
+    let f1 = {...form};
+    f1[name]=value;
+    setForm(f1);
+  }
+   //Form Validation
+   const validate = ()=>{
+    let err = {...errors};
+    err.name = !form.name ? 'Name Cannot be empty!!':'';
+    err.text = !form.text ? 'Enter Text Message':'';
+    return err;
+  }
+const isValid =(errors)=>{
+  let keys = Object.keys(errors);
+  let count =keys.reduce((acc,curr)=>errors[curr] ?acc+1:acc,0);
+  return count===0;
+}
+  const postData = async(obj,url)=>{
+      try{
+        let res = await httpReq.post(url,obj);
+        console.log(res);
+        if(res.status===201){
+          setForm({
+            text:'',
+            name:'',
+            type:msgType,
+            user:user ? user._id :''
+          });
+        }
+      }catch(err){
+        console.log(err);
+        if(err && err.response && err.response.status===400){
+          alert(err.response.data);
+        }
+      }
+    }
+  const putData = async(obj,url)=>{
+      try{
+        let res = await httpReq.put(url,obj);
+        console.log(res);
+        if(res.status===201){
+          setForm({
+          text:'',
+          name:'',
+          type:msgType,
+          user:user ? user._id :''
+        });
+        }
+      }catch(err){
+        console.log(err);
+        if(err && err.response && err.response.status===400){
+          alert(err.response.data);
+        }
+      }
+    }
+    const handleSubmit = ()=>{
+        let errors = validate();
+        //Check if any errors
+        if(isValid(errors)){
+          setErrors({});
+          if(id){
+            putData(form,`/template/${id}`)
+          }else{
+            postData(form,`/user/${user._id}/template`);
+          }
+          //alert('Submitted!!!')
+        }else{
+          setErrors(errors);
+        }
+    }
+  
     return (
       <div className="grid grid-flow-row-dense grid-cols-12 ">
          <Sidebar 
@@ -43,32 +146,38 @@ const CreateTemplates = () => {
                 <button onClick={()=>setMsgType('location')}  className={`${msgType==='location' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md  text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Send Location</button>
               </div>
               <div className='lg:col-span-5   p-4'>
-                <div className=''>
-                      
+                <div className=''>  
                       <div>
                         <label className='text-gray-500 lg:mx-2'>Template Name</label>
                         <br/>
                         <input
                           type='text'
+                          name='name'
+                          value={form.name}
+                          onChange={handleChange}
                           placeholder=''
                           className='border my-2 focus:shadow-md focus:border-none rounded-md w-full p-2 text-sm lg:text-base  border-gray-200'
                         />
+                        {errors && errors.name && <span className='text-sm text-pink-800'>{errors.name}</span>}
                       </div>
                 </div>
-                {/* Plain Message */}
-                {msgType==='plain' && (
-                  <>
-                    <div className='flex justify-center my-4'>
+                <div className='flex justify-center my-4'>
                       <textarea
+                      name='text'
+                      value={form.text}
+                      onChange={handleChange}
                       placeholder='type your message here...'
                       className='border rounded w-full p-3 '
                       cols={60}
                       rows={8}
                       ></textarea>
-                    </div>
-                    <div className='flex justify-end'>
-                      <button className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Send</button>
-                    </div>
+                       {errors && errors.text && <span className='text-sm text-pink-800'>{errors.text}</span>}
+                </div>
+
+                {/* Plain Message */}
+                {msgType==='plain' && (
+                  <>
+                    
                   </>
                 )}
                 {/* Message With Media */}
@@ -82,30 +191,14 @@ const CreateTemplates = () => {
                       className='my-2 text-sm'
                     />
                     </div>
-                    <div className='flex justify-center my-4'>
-                      <textarea
-                      placeholder='type your message here...'
-                      className='border  rounded w-full p-3 '
-                      cols={60}
-                      rows={8}
-                      ></textarea>
-                    </div>
-                    <div className='flex justify-end'>
-                      <button className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Send</button>
-                    </div>
+                    
+                   
                   </>
                 )}
                 {/* Message with button */}
                 {msgType==='with button' && (
                   <>
-                    <div className='flex justify-center my-4'>
-                      <textarea
-                      placeholder='type your message here...'
-                      className='border  rounded w-full p-3 '
-                      cols={60}
-                      rows={8}
-                      ></textarea>
-                    </div>
+                    
                     <div className='  my-4'>
                       <label className='text-gray-500 text-start mx-2'>Footer Text</label>
                       <input
@@ -115,26 +208,14 @@ const CreateTemplates = () => {
                     <div className='my-4'>
                         <BtnGroup/>
                     </div>
-                    <div className='flex justify-end'>
-                      <button className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Send</button>
-                    </div>
+                    
                   </>
                 )}
                 {/* List Message */}
                 {msgType==='list' && (
                   <>
-                    <div className='flex justify-center my-4'>
-                      <textarea
-                      placeholder='type your message here...'
-                      className='border  rounded w-full p-3 '
-                      cols={60}
-                      rows={8}
-                      ></textarea>
-                    </div>
                     <ListMsg/>
-                    <div className='flex justify-end'>
-                      <button className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Send</button>
-                    </div>
+                    
                   </>
                 )}
                 {/* Location */}
@@ -158,11 +239,12 @@ const CreateTemplates = () => {
                           />
                       </div>
                     </div>
-                    <div className='flex justify-end'>
-                      <button className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Send</button>
-                    </div>
+                    
                   </>
                 )}
+                <div className='flex justify-end'>
+                      <button onClick={()=>handleSubmit()} className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Send</button>
+                </div>
               </div>
           </div>
         </div>

@@ -2,15 +2,70 @@ import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeft, faBarsProgress, faClipboardList, faFile, faLayerGroup, faRocket } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faBarsProgress, faChevronDown, faClipboardList, faFile, faLayerGroup, faRocket } from '@fortawesome/free-solid-svg-icons'
 import AddRecordModal from '../components/AddRecordModal'
 import ContactListModal from '../components/ContactListModal'
 import ImportContactsModal from '../components/ImportContactsModal'
 import { faCreativeCommonsSa } from '@fortawesome/free-brands-svg-icons'
 import Sidebtn from '../components/Sidebtn'
+import { useEffect } from 'react'
+import authService from '../service/authService'
+import httpReq from '../service/httpReq';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+
 
 const MyTemplates = () => {
     const[showSidebar,setShowSidebar]=useState(false);
+    const [data,setData]=useState([]);
+    const user = authService.getUser();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const[confirmDel,setConfirmDel]=useState(false);
+    const [delId,setDelId]=useState('');
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+    const removeData =async(url)=>{
+        try{
+            let response = await httpReq.deleteApi(`/template/${delId}`);
+            console.log(response);
+            if(response.status===201){
+                setConfirmDel(false);
+                fetchData();
+            }
+        }catch(err){
+            console.log(err)
+        }
+    }
+    const handleDelete =async(id)=>{
+        if(id){
+            setDelId(id);
+            handleClose();
+            setConfirmDel(true);
+        }
+    }
+    const fetchData = async()=>{
+        try{
+            const response = await httpReq.get(`/user/${user._id}/templates`);
+            console.log(response);
+            if(response.status===200){
+                setData(response.data);
+            }
+        }catch(err){
+            console.log(err);
+        }
+    }
+    useEffect(()=>{
+        fetchData();
+    },[]);
   return (
       <div className="grid grid-flow-row-dense grid-cols-12 ">
           <Sidebar 
@@ -86,17 +141,71 @@ const MyTemplates = () => {
                   <div className='px-8 my-5 min-h-96 py-5 bg-white rounded-md shadow-md w-full overflow-scroll'>
                       
                       <table className='text-slate-500 w-full '>
-                          <hr />
-                          <tr className='text w-full text-xs my-2 font-serif flex lg:grid lg:grid-cols-8   '>
+                       
+                          <tr className='text border-y py-2 w-full text-xs my-2 font-serif flex lg:grid lg:grid-cols-8   '>
                               <td className='col-span-2 min-w-48'>TEMPLATE NAME</td>
                               <td className='col-span-2 min-w-48'>TYPE</td>
                               <td className='col-span-2 min-w-48'>STATUS</td>
                               <td className='col-span-2 min-w-48'>ACTION</td>
                           </tr>
-                          <hr />
+                          {data.length>0 && data.map((a,ind)=>(
+                            <tr 
+                                className='text w-full text-sm my-2 font-serif flex lg:grid lg:grid-cols-8 '
+                                key={ind}
+                            >
+                            <td className='col-span-2 min-w-48'>{a.name}</td>
+                              <td className='col-span-2 min-w-48'>{a.type}</td>
+                              <td className='col-span-2 min-w-48'>{a.status}</td>
+                              <td className='col-span-2 text-sm min-w-48'>
+                                <button
+                                    id="basic-button"
+                                    className='text-xs border p-1 font-semibold rounded-lg px-1.5'
+                                    aria-controls={open ? 'basic-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={open ? 'true' : undefined}
+                                    onClick={handleClick}
+                                >
+                                Action
+                                <FontAwesomeIcon className='ps-1 text-xs' icon={faChevronDown}/>
+                                </button>
+                                <Menu
+                                    // id="basic-menu"
+                                    className='text-sm'
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleClose}
+                                    MenuListProps={{
+                                    'aria-labelledby': 'basic-button',
+                                    }}
+                                >
+                                    <MenuItem className=' text-xs hover:text-[#0a474c]' onClick={handleClose}>
+                                        <Link to={`/template/edit/${a._id}`} className='text- '>Edit</Link>
+                                    </MenuItem>
+                                    <MenuItem className=' hover:text-[#0a474c]' onClick={()=>handleDelete(a._id)}>Delete</MenuItem>
+                                </Menu>
+                              </td>
+                            </tr>
+                          ))}
+                         
                       </table>
                   </div>
               </div>
+                <Dialog
+                    open={confirmDel}
+                    onClose={()=>setConfirmDel(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                    {"Are you sure you want to delete this Contact?"}
+                    </DialogTitle>
+                    <DialogActions>
+                        <Button className='' onClick={()=>removeData()}>Yes</Button>
+                        <Button className='text-gray-600' onClick={()=>setConfirmDel(false)} autoFocus>
+                            Cancel
+                        </Button>
+                    </DialogActions>
+                </Dialog>
           </div>
         
       </div>

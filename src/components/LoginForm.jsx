@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
+import httpReq from '../service/httpReq';
+import authService from '../service/authService';
 
 const LoginForm = () => {
   const[form,setForm]=useState({email:'',password:''});
@@ -9,8 +11,23 @@ const LoginForm = () => {
     f1[name]=value;
     setForm(f1);
   }
+  const postData = async(obj,url)=>{
+    try{
+      let res = await httpReq.post(url,obj);
+      //console.log(res.data);
+      authService.login(res.data);
+      window.location = '/dashboard';
+    }catch(err){
+      console.log(err);
+      if(err && err.response && err.response.status===400){
+        alert(err.response.data);
+      }
+    }
+  }
   const handleSubmit = ()=>{
-    alert('submitted!');
+      
+        postData(form,'/login');
+       
   }
   return (
     <div>
