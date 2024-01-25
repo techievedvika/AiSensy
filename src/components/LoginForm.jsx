@@ -15,8 +15,9 @@ const LoginForm = () => {
     try{
       let res = await httpReq.post(url,obj);
       //console.log(res.data);
+      let user = res.data;
       authService.login(res.data);
-      window.location = '/dashboard';
+      window.location = user.role==='superadmin' ? '/admin/dashboard':'/dashboard';
     }catch(err){
       console.log(err);
       if(err && err.response && err.response.status===400){

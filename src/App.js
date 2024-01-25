@@ -18,6 +18,10 @@ import SubsPlans from './pages/SubsPlans';
 import logout from './pages/logout';
 import Group from './pages/Group';
 import MessageDetails from './pages/SentMessages';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import HelpSupport from './pages/HelpSupport';
+import UserTickets from './pages/admin/UserTickets';
+import Customers from './pages/admin/Customers';
 
 function App() {
   return (
@@ -26,6 +30,7 @@ function App() {
         <Route path='/home' component={Home}/>
         <Route path='/login' component={Login}/>
         <Route path='/signup' component={Signup}/>
+        <Route path='/admin/dashboard' component={AdminDashboard}/>
         <Route path='/dashboard' component={Dashboard}/>
         <Route path='/contacts' component={Contacts}/>
         <Route path='/messages' component={Messages}/>
@@ -42,6 +47,9 @@ function App() {
         <Route path='/logout' component={logout}/>
         <Route path='/group' component={Group}/>
         <Route path='/user/messages' component={MessageDetails}/>
+        <Route path='/user/support' component={HelpSupport}/>
+        <Route path='/admin/tickets' component={UserTickets}/>
+        <Route path='/admin/customers' component={Customers}/>
         <Redirect from='/' to='/home'/>
       </Switch>
     </>

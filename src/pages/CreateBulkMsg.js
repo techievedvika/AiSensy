@@ -22,7 +22,7 @@ const CreateBulkMsg = () => {
               show={showSidebar}
               handleClose={()=>setShowSidebar(false)}
             />
-        <div className={`lg:col-span-11 col-span-12 ${(showAddRcrd || showContactList ||showImportContact) ? ' opacity-50 bg-[#f0f0f0]':''} ${showSidebar && 'hidden'}`}>
+        <div className={`lg:relative lg:ms-24 col-span-12 ${(showAddRcrd || showContactList ||showImportContact) ? ' opacity-50 bg-[#f0f0f0]':''} ${showSidebar && 'hidden'}`}>
             <Sidebtn
                 onShow={()=>setShowSidebar(!showSidebar)}
             />
@@ -92,27 +92,29 @@ const CreateBulkMsg = () => {
         </div>
          {/* Add Record Modal */}
          {showAddRcrd && (
-                    <div className='relative col-span-12'>
                         <AddRecordModal
                             onClose={handleShow}
+                            open={showAddRcrd}
                         />
-                    </div>
+                  
         )}
         {/* Contact list Modal */}
          {showContactList && (
-                    <div className='relative col-span-12'>
+                    
                         <ContactListModal
                             onClose={()=>setShowContactList(false)}
+                            open={showContactList}
                         />
-                    </div>
+               
         )}
         {/* Import Contacts Modal */}
          {showImportContact && (
-                    <div className='relative col-span-12'>
+                  
                         <ImportContactsModal
+                            open={showImportContact}
                             onClose={()=>setShowImportContacts(false)}
                         />
-                    </div>
+                   
         )}
     </div>
   )

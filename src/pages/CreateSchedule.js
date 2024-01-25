@@ -13,7 +13,7 @@ const CreateSchedule = () => {
               show={showSidebar}
               handleClose={()=>setShowSidebar(false)}
         />
-        <div className={`lg:col-span-11 col-span-12  ${showSidebar && 'hidden'}`}>
+        <div className={`lg:ms-24 lg:relative col-span-12  ${showSidebar && 'hidden'}`}>
           <Sidebtn
             onShow={()=>setShowSidebar(!showSidebar)}
           />

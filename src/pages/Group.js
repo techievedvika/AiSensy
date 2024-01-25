@@ -20,14 +20,16 @@ const Group = () => {
         try{
             let response = await httpReq.get(`/groups/${user._id}`);
             console.log(response.data);
-            setGroups(response.data);
+            if(response.status===200){
+                setGroups(response.data);
+            }
         }catch(err){
             console.log(err);
         }
     }
     useEffect(()=>{
         getData();
-    },[]);
+       },[showModal]);;
     const delGroup = async(url)=>{
         try{
             let response = await httpReq.deleteApi(url);
@@ -50,13 +52,13 @@ const Group = () => {
               show={showSidebar}
               handleClose={()=>setShowSidebar(false)}
             />
-        <div className={`lg:col-span-11 col-span-12 border ${showSidebar && 'hidden'} ${showModal && ' opacity-15 '}`}>
+        <div className={`lg:ms-24 lg:relative col-span-12 border ${showSidebar && 'hidden'} ${showModal && ' opacity-15 '}`}>
             <Sidebtn
             onShow={()=>setShowSidebar(!showSidebar)}
             />
               {/* Navbar */}
               <div className="flex  bg-white border shadow-md  justify-between p-3 lg:px-6">
-                  <h3 className="text-xl"> My Templates</h3>
+                  <h3 className="text-xl"> My Groups</h3>
                   <div className="hidden lg:block  justify-around gap-2">
                   </div>
               </div>
@@ -148,11 +150,11 @@ const Group = () => {
           </div>
           {/* Import Contacts Modal */}
          {showModal && (
-                    <div className='relative col-span-12'>
                         <CreateGroupModal
                             onClose={()=>setShowModal(false)}
+                            open={showModal}
                         />
-                    </div>
+              
         )}
         
       </div>

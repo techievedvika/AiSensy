@@ -8,15 +8,74 @@ const userSchema = new mongoose.Schema({
     password:String,
     role:{type:String,enum:['admin','user','superadmin'],default:'user'},
     address:String,
-    image:String,
+    image:{
+        data:Buffer,
+        type:String
+    },
     createdById:{type:mongoose.Schema.Types.ObjectId,ref:'User'}
 
 });
 
 //Plans Schema 
 const plansSchema = new mongoose.Schema({
-    
+    name:String,
+    duration:{
+        type:String,
+        enum:['Monthly','Quarterly','Yearly'],
+        default:'Monthly'
+    },
+    price:String,
+    messages:Number,
+    contacts:{
+        type:Number,
+        
+    },
+    templates:Number,
+    chatBot:{
+        type:String,
+        enum:['yes','no'],
+        default:'yes'
+    },
+    chatListAccess:{
+        type:String,
+        enum:['yes','no'],
+        default:'yes'
+    },
+    groupListAccess:{
+        type:String,
+        enum:['yes','no'],
+        default:'yes'
+    },
+    trial:{
+        type:String,
+        enum:['yes','no'],
+        default:'yes'
+    },
+    featured:{
+        type:String,
+        enum:['yes','no'],
+        default:'yes'
+    },  
+
 })
+//Support Tickets
+const ticketSchema = new mongoose.Schema(
+    {
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    },
+    subject:String,
+    message:String,
+    reply:String,
+    status:{
+        type:String,
+        enum:['pending','resolved'],
+        default:'pending'
+    }
+},
+{timestamps:true}
+)
 //contacts
 const contactSchema = new mongoose.Schema({
     name:String,
@@ -72,9 +131,25 @@ const templateSchema = new mongoose.Schema({
 
 
 })
+const imageSchema = new mongoose.Schema({
+    data: Buffer,
+    contentType: String,
+  });
 const User = mongoose.model('User',userSchema);
 const Contact = mongoose.model('Contact',contactSchema);
 const Message = mongoose.model('Message',msgSchema);
 const Group = mongoose.model('Group',groupSchema);
 const Template = mongoose.model('Template',templateSchema);
-module.exports = {User,Contact,Message,Group,Template};
+const SubsPlan =mongoose.model('SubsPlan',plansSchema);
+const Ticket=mongoose.model('Ticket',ticketSchema);
+const Image=mongoose.model('Image',imageSchema);
+module.exports = {
+    User,
+    Contact,
+    Message,
+    Group,
+    Template,
+    SubsPlan,
+    Ticket,
+    Image
+};

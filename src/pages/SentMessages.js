@@ -34,7 +34,7 @@ const MessageDetails = () => {
               show={showSidebar}
               handleClose={()=>setShowSidebar(false)}
             />
-        <div className={`lg:col-span-11 col-span-12 border ${showSidebar && 'hidden'} `}>
+        <div className={`lg:ms-24 lg:relative col-span-12 border ${showSidebar && 'hidden'} `}>
             <Sidebtn
             onShow={()=>setShowSidebar(!showSidebar)}
             />

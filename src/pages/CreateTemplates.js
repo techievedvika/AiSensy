@@ -113,14 +113,13 @@ const isValid =(errors)=>{
           setErrors(errors);
         }
     }
-  
     return (
       <div className="grid grid-flow-row-dense grid-cols-12 ">
          <Sidebar 
               show={showSidebar}
               handleClose={()=>setShowSidebar(false)}
             />
-        <div className={`lg:col-span-11 col-span-12  ${showSidebar && 'hidden'}`}>
+        <div className={`lg:ms-24 lg:relative col-span-12  ${showSidebar && 'hidden'}`}>
           <Sidebtn
             onShow={()=>setShowSidebar(!showSidebar)}
           />
@@ -198,7 +197,6 @@ const isValid =(errors)=>{
                 {/* Message with button */}
                 {msgType==='with button' && (
                   <>
-                    
                     <div className='  my-4'>
                       <label className='text-gray-500 text-start mx-2'>Footer Text</label>
                       <input
@@ -207,15 +205,13 @@ const isValid =(errors)=>{
                     </div>
                     <div className='my-4'>
                         <BtnGroup/>
-                    </div>
-                    
+                    </div>    
                   </>
                 )}
                 {/* List Message */}
                 {msgType==='list' && (
                   <>
-                    <ListMsg/>
-                    
+                    <ListMsg/> 
                   </>
                 )}
                 {/* Location */}
@@ -239,11 +235,10 @@ const isValid =(errors)=>{
                           />
                       </div>
                     </div>
-                    
                   </>
                 )}
                 <div className='flex justify-end'>
-                      <button onClick={()=>handleSubmit()} className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Send</button>
+                      <button onClick={()=>handleSubmit()} className='rounded-md p-2 px-3 hover:opacity-80 text-white bg-[#0a474c] '>Save</button>
                 </div>
               </div>
           </div>

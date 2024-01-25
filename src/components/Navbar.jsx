@@ -33,9 +33,12 @@ const Navbar = () => {
             <Link to='/'>
                       <div className='  transition duration-150 hover:ease-out hover:-translate-y-0.5 p-2  text-center rounded m-1'>Integrations</div>
             </Link>
-            <Link to='/pricing'>
+            {!user && (<Link to='/pricing'>
                       <button className='border py-2 px-3 text-white bg-green-500 rounded m-1 transition duration-150 hover:bg-green-600 hover:ease-in hover:-translate-y-px'>Start 14-Day Free Trial</button>
-            </Link>
+            </Link>)}
+            {user && (<Link to='/dashboard'>
+                      <button className='border py-2 px-3 text-white bg-green-500 rounded m-1 transition duration-150 hover:bg-green-600 hover:ease-in hover:-translate-y-px'>Go to Dashboard</button>
+            </Link>)}
             {!user && (
               <Link to='/login'>
               <div className='border-2 border-black transition duration-150 hover:ease-out hover:-translate-y-0.5 p-2  text-center rounded m-1'>Login</div>

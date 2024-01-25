@@ -19,12 +19,12 @@ const Dashboard = () => {
 	const [phone,setPhoneValue]=useState();
     return (
     <>
-      <div className="grid grid-flow-row-dense grid-cols-12 ">
+      <div className="grid relative grid-cols-12 ">
             <Sidebar 
               show={showSidebar}
               handleClose={()=>setShowSidebar(false)}
             />
-        <div className={`lg:col-span-11 col-span-12 border ${showSidebar && 'hidden'}`}>
+        <div className={`lg:col-span-11 lg:absolute lg:ms-24 col-span-12 border ${showSidebar && 'hidden'}`}>
           <Sidebtn
             onShow={()=>setShowSidebar(!showSidebar)}
           />

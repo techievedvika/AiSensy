@@ -117,7 +117,7 @@ const Contacts = () => {
               show={showSidebar}
               handleClose={()=>setShowSidebar(false)}
             />
-      <div className={`lg:col-span-11 col-span-12 ${(showModal || showFormModal) && ' opacity-15'}  ${showSidebar && 'hidden'}`}>
+      <div className={`lg:relative lg:ms-24 col-span-12 ${(showModal || showFormModal) && ' opacity-15'}  ${showSidebar && 'hidden'}`}>
           <Sidebtn
             onShow={()=>setShowSidebar(!showSidebar)}
           />
@@ -216,7 +216,7 @@ const Contacts = () => {
           {/* Contacts Container */}
           <div className=' mb-4 border  overflow-scroll  border-gray-400 bg-white   rounded-lg shadow-sm '>
             <table className=''>
-                <tr className='bg-white  px-6 py-3 grid grid-cols-10 font-medium text-slate-900 f'>
+                <tr className='bg-white  px-6 py-3 flex  font-medium text-slate-900 f'>
                     <td className=' min-w-48 col-span-2 py-3'>
                         <input
                             type='checkbox'
@@ -224,7 +224,7 @@ const Contacts = () => {
                         />
                         Name
                     </td>
-                    <td className=' min-w-48 col-span-2 py-3'>Mobile Number</td>
+                    <td className=' min-w-48 col-span-2 py-3'>Mobile </td>
                     <td className=' min-w-48 col-span-2 py-3'>Status</td>
                     <td className=' min-w-48 col-span-2 py-3'>Groups</td>               
                     <td className=' min-w-48 col-span-2 py-3'>Action</td>               
@@ -235,7 +235,7 @@ const Contacts = () => {
                       {data.length>0 && data.map((a,ind)=>(
                         <>
 
-                        <tr key={ind} className='bg-white w-full grid grid-cols-10 px-6 py-3  font-normal text-slate-900'>
+                        <tr key={ind} className='bg-white w-full flex px-6 py-3  font-normal text-slate-900'>
                           <td className='col-span-2 min-w-48'>{a.name}</td>
                           <td className='col-span-2 min-w-48'>{a.mobile}</td>
                           <td className='col-span-2 min-w-48'>{a.status}</td>
@@ -321,6 +321,7 @@ const Contacts = () => {
         {showFormModal && (
           <div className='relative col-span-12'>
             <ContactForm
+            open={showFormModal}
               onClose={()=>setShowFormModal(false)}
               editId = {edit}
             />

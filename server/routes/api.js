@@ -1,27 +1,68 @@
 const express = require('express');
-const{User,Contact,Message,Group,Template} = require('../models/schema');
+const bcrypt = require('bcrypt');
+const multer = require('multer');
+const upload = multer();
+const{
+    User,Contact,
+    Message,Group,
+    Template,SubsPlan,
+    Ticket,Image
+} = require('../models/schema');
 const router = express.Router();
 
 //Get all users
 router.get('/users',async(req,res)=>{
     try{
         const users = await User.find();
-        return res.json(users);     
+        return res.status(200).json(users);     
     }catch(err){
         return res.status(404).send(err);
     }
 })
+router.post('/upload', upload.single('image'), async (req, res) => {
+    try {
+      const image = new Image({
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      });
+  
+      let uploaded = await image.save();
+  
+      return res.status(201).json({ message: 'Image uploaded successfully' ,img:uploaded});
+    } catch (error) {
+      //console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  router.get('/images/:id', async (req, res) => {
+    try {
+      const image = await Image.findById(req.params.id);
+  
+      if (!image) {
+        return res.status(404).json({ error: 'Image not found' });
+      }
+  
+      res.set('Content-Type', image.contentType);
+      return res.send(image.data);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
 //User Registration
 router.post('/register',async(req,res)=>{
     try{
-        let {email}=req.body;
+        let {email,password}=req.body;
         //Check if user already exists
         const user = await User.findOne({email});
         if(user){
             return res.status(400).send('Email Already Exists')
         }
-        const newUser = await User.create(req.body);
-        return res.json({id:newUser._id,name:newUser.name});
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const newUser = await User.create({...req.body,password:hashedPassword});
+        return res.json({id:newUser._id,email:newUser.email,role:newUser.role});
     }catch(err){
         return res.status(404).send(err);
     }
@@ -30,11 +71,14 @@ router.post('/register',async(req,res)=>{
 router.post('/login',async(req,res)=>{
     try{
         let {email,password}=req.body;
-        const user = await User.findOne({email,password});
+        const user = await User.findOne({email});
         if(user){
-            return res.status(201).json({name:user.name,_id:user._id});
+            const matchPass = await bcrypt.compare(password,user.password);
+            if(matchPass){
+                return res.status(201).json({email:user.email,_id:user._id,role:user.role});
+            }
         }
-        return res.status(400).send('Incorrect Username or password');
+        return res.status(401).send('Incorrect Username or password');
     }catch(err){
         return res.status(404).send(err);
     }
@@ -76,12 +120,18 @@ router.put('/editprofile/password/:id',async(req,res)=>{
         let {id}=req.params;
         let {password,newpassword} = req.body;
         let user = await User.findById(id);
-        if(user.password!==password){
-            return res.status(400).send('Incorrect Old Password!!');
+        if(user){
+            const matchPass = await bcrypt.compare(password,user.password);
+            if(matchPass){
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(newpassword, saltRounds);
+                let newUser = {...user.toObject(),password:hashedPassword};
+                let updated = await User.findByIdAndUpdate(id,newUser,{new:true});
+                return res.status(201).json(updated);
+            }
         }
-        let newUser = {...user.toObject(),password:newpassword};
-        let updated = await User.findByIdAndUpdate(id,newUser,{new:true});
-        return res.status(201).json(updated);
+        return res.status(400).send('Incorrect Old Password!!');
+       
     }catch(err){
         return res.status(404).send(err);
     }
@@ -386,6 +436,88 @@ router.delete('/template/:id',async(req,res)=>{
         return res.status(404).json({message:'Template Not found!!'});
     }catch(err){
         return res.status(400).send(err);
+    }
+});
+//Create a Subscription plan
+router.post('/admin/plans/new',async(req,res)=>{
+    try{
+        let {name}=req.body;
+        let findPlan = await SubsPlan.findOne({name:name});
+        if(findPlan){
+            return res.status(400).json({message:'Choose a different name!!'})
+        }
+        let newPlan = await SubsPlan.create(req.body);
+        return res.status(201).json(newPlan);
+    }catch(err){
+        return res.status(404).send(err);
+    }
+})
+//fetch subscription plans
+router.get('/plans',async(req,res)=>{
+    try{
+        const plans = await SubsPlan.find();
+        res.status(200).json(plans);
+    }catch(err){
+        res.status(404).send(err);
+    }
+})
+//Edit an existing subscription plan
+router.put('/admin/plans/:id',async(req,res)=>{
+    try{
+        let{id}=req.params;
+        const plan = await SubsPlan.findById(id);
+        if(plan){
+            let newplan = {...plan.toObject(),...req.body};
+            const updated=await SubsPlan.findByIdAndUpdate(id,newplan,{new:true});
+            return res.status(200).json(updated);
+        }else{
+            return res.status(404).json({message:'No plan found!!'});
+        }
+    }catch(err){
+        return res.status(400).send(err);
+    }
+})
+//create a ticket
+router.post('/user/ticket',async(req,res)=>{
+    try{
+        let ticket = await Ticket.create(req.body);
+        return res.status(201).json(ticket);
+    }catch(err){
+        return res.status(404).send(err);
+    }
+})
+//fetch user tickets
+router.get('/user/:id/tickets',async(req,res)=>{
+    try{
+        let {id}=req.params;
+        const tickets = await Ticket.find({user:id});
+        return res.status(200).json(tickets);
+    }catch(err){
+        return res.status(404).send(err);
+    }
+})
+//fetch all tickets
+router.get('/admin/tickets',async(req,res)=>{
+    try{
+        let tickets = await Ticket.find();
+        return res.status(200).json(tickets);
+    }catch(err){
+        return res.status(404).send(err);
+    }
+})
+//update a ticket
+router.put('/admin/ticket/:id',async(req,res)=>{
+    try{
+        let {id}=req.params;
+        let findTicket = await Ticket.findById(id);
+        if(findTicket){
+            let newticket = {...findTicket.toObject(),...req.body,status:'resolved'};
+            let updated = await Ticket.findByIdAndUpdate(id,newticket,{new:true});
+            return res.status(201).json(updated);
+        }
+        return res.status(404).json({message:'Could not find ticket'})
+    }catch(err){
+        return res.status(404).send(err);
     }
 })
 module.exports = router;
