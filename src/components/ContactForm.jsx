@@ -19,7 +19,7 @@ const ContactForm = ({onClose,editId,open}) => {
     const fetchGroups =async()=>{
         try{
             let response = await httpReq.get(`/groups/${user._id}`);
-            console.log(response.data);
+            //console.log(response.data);
             if(response.status===200){
                 setGroups(response.data);
             }
@@ -32,10 +32,10 @@ const ContactForm = ({onClose,editId,open}) => {
         if(editId){
                 try{
                     let response = await httpReq.get(`/contact/${editId}`);
-                    console.log(response.data);
+                    //console.log(response.data);
                     if(response.status===200){
                         setForm(response.data);
-                        console.log(form);
+                        //console.log(form);
                     }
                 }catch(err){
                     console.log(err);
@@ -111,8 +111,8 @@ const ContactForm = ({onClose,editId,open}) => {
             console.log(err);
         }
     }
-    const handleSubmit = (e)=>{
-        e.preventDefault();
+    const handleSubmit = ()=>{
+        //e.preventDefault();
         let errors = validate();
         //Check if any errors
         if(isValid(errors)){
@@ -155,7 +155,7 @@ const ContactForm = ({onClose,editId,open}) => {
                 onClose={onClose}
         
             >
-                <DialogTitle>Create a New Ticket</DialogTitle>
+                <DialogTitle>Add a new Contact</DialogTitle>
                 <DialogContent >
                     <DialogContentText className='text-center '>
                     </DialogContentText>

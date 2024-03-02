@@ -4,8 +4,7 @@ import httpReq from '../../service/httpReq';
 import Sidebar from '../../components/Sidebar';
 import Sidebtn from '../../components/Sidebtn';
 
-const Customers = () => {
-    const[showSidebar,setShowSidebar]=useState(false);
+const Customers = ({show,onShow,onClose,lgScreen}) => {
     const [data,setData]=useState([]);
     const user = authService.getUser();
     const fetchData = async()=>{
@@ -27,12 +26,13 @@ const Customers = () => {
   return (
       <div className="grid relative grid-flow-row-dense grid-cols-12 ">
           <Sidebar 
-              show={showSidebar}
-              handleClose={()=>setShowSidebar(false)}
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
             />
-           <div className={` lg:relative lg:ms-24 col-span-12 border ${showSidebar && 'hidden'}`}>
+           <div className={` lg:relative lg:ms-60 col-span-12 border ${show && 'hidden'}`}>
             <Sidebtn
-            onShow={()=>setShowSidebar(!showSidebar)}
+            onShow={onShow}
             />
               {/* Navbar */}
               <div className="flex  bg-white border shadow-md  justify-between p-3 lg:px-6">

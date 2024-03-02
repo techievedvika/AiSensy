@@ -12,8 +12,8 @@ const userSchema = new mongoose.Schema({
         data:Buffer,
         type:String
     },
+    plan:{type:mongoose.Schema.Types.ObjectId,ref:'SubsPlan'},
     createdById:{type:mongoose.Schema.Types.ObjectId,ref:'User'}
-
 });
 
 //Plans Schema 
@@ -129,7 +129,32 @@ const templateSchema = new mongoose.Schema({
     button:String,
     status:{type:String,enum:['active','inactive'],default:'inactive'}
 
-
+})
+//bulk messages
+const bulkMsgSchema = new mongoose.Schema({
+    sender:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+    receivers:{type:Array,default:[]},
+    msg:String,
+    status:{type:String,enum:['pending','sent']}
+});
+//live chat
+const chatSchema = new mongoose.Schema({
+    user:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+    sent:String,
+    received:{type:String,default:'Hello from server!'}
+});
+const scheduleSchema = new mongoose.Schema({
+    sender:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
+    receiver:{type:mongoose.Schema.Types.ObjectId,ref:'Contact'},
+    name:String,
+    type:{
+        type:String,
+        enum:['plain','with media','with button','list','location'],
+        default:'plain'
+    },
+    text:String,
+    scheduleAt:String,
+    status:{type:String,enum:['pending','sent'],default:'pending'}
 })
 const imageSchema = new mongoose.Schema({
     data: Buffer,
@@ -143,6 +168,11 @@ const Template = mongoose.model('Template',templateSchema);
 const SubsPlan =mongoose.model('SubsPlan',plansSchema);
 const Ticket=mongoose.model('Ticket',ticketSchema);
 const Image=mongoose.model('Image',imageSchema);
+const Chats = mongoose.model('Chats',chatSchema);
+const BulkMessage = mongoose.model('BulkMessage',bulkMsgSchema);
+const Schedule = mongoose.model('Schedule',scheduleSchema);
+
+
 module.exports = {
     User,
     Contact,
@@ -151,5 +181,8 @@ module.exports = {
     Template,
     SubsPlan,
     Ticket,
-    Image
+    Image,
+    Chats,
+    BulkMessage,
+    Schedule
 };

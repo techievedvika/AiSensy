@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 import Sidebtn from '../components/Sidebtn';
 import httpReq from '../service/httpReq';
 import authService from '../service/authService';
+import NavMenu from '../components/NavMenu';
 
-const EditProfile = () => {
-    const[showSidebar,setShowSidebar]=useState(false);
+const EditProfile = ({show,onShow,onClose,lgScreen}) => {
     const [form,setForm] = useState({name:'',email:'',mobile:'',address:''});
     const [pform,setPform] = useState({password:'',newpassword:'',confirmpassword:''})
     const user = authService.getUser();
@@ -60,21 +60,17 @@ const EditProfile = () => {
   return (
       <div className="grid grid-flow-row-dense grid-cols-12 ">
           <Sidebar 
-              show={showSidebar}
-              handleClose={()=>setShowSidebar(false)}
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
             />
-          <div className={`lg:ms-24 lg:relative col-span-12 border ${showSidebar && 'hidden'}`}>
-            <Sidebtn
-            onShow={()=>setShowSidebar(!showSidebar)}
-            />
-              {/* Navbar */}
-              <div className="flex  bg-white border shadow-md  justify-between p-3 lg:px-6">
-                  <h3 className="text-xl"> Edit your profile</h3>
-                  <div className="hidden lg:block  justify-around gap-2">
-                  </div>
-              </div>
+          <div className={`lg:ms-60 lg:relative col-span-12 border ${show && 'hidden'}`}>
+                <NavMenu
+                onShow={onShow}
+                page={'Profile'}
+                />
               {/* Messages */}
-              <div className="bg-[#f7f7f7]  flex flex-col     gap-4 w-full p-6 lg:px-32 ">
+              <div className="bg-[#f7f7f7]  flex flex-col     gap-4 w-full p-6 lg:px-10 ">
                 {/* General Settings */}
                 <div className='flex flex-col my-4 mt-8 lg:flex-row gap-6 lg:justify-between'>
                     <div>

@@ -5,7 +5,7 @@ import { faBolt, faBookOpen, faCalendarDays, faCheck, faChevronDown, faChevronUp
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({show,onShow,onClose,lgScreen}) => {
   const[showApiDetails,setShowApiDetails]=useState(true); //Toggle whatsapp Business APi button
   const[showPhoneDetails,setShowPhoneDetails]=useState(false); //Toggle Phone annd Display Name Verification button
   const[showfbDetails,setShowfbDetails]=useState(false);//Toggle facebook Manager Verification button
@@ -18,13 +18,14 @@ const [phone,setPhoneValue]=useState();
   return (
   <>
     <div className="grid relative grid-cols-12 ">
-          <Sidebar 
-            show={showSidebar}
-            handleClose={()=>setShowSidebar(false)}
-          />
-      <div className={`lg:col-span-11 lg:absolute lg:ms-24 col-span-12 border ${showSidebar && 'hidden'}`}>
+            <Sidebar 
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
+            />
+      <div className={`lg:col-span-11 lg:absolute lg:ms-60 col-span-12 border ${show && 'hidden'}`}>
         <Sidebtn
-          onShow={()=>setShowSidebar(!showSidebar)}
+          onShow={onShow}
         />
         {/* NAVBAR */}
         <div className="flex flex-col gap-3 lg:flex-row lg:justify-between p-4">

@@ -9,10 +9,12 @@ import Sidebtn from '../components/Sidebtn';
 import authService from '../service/authService'
 import httpReq from '../service/httpReq'
 import { useEffect } from 'react'
+import NavMenu from '../components/NavMenu'
 
 
 const CreateTemplates = (props) => {
   let {id}=props.match.params;
+  let {show,onShow,onClose,lgScreen} = props;
   const[msgType,setMsgType]=useState('plain');
   const user =authService.getUser();
   const[form,setForm]=useState({
@@ -116,19 +118,15 @@ const isValid =(errors)=>{
     return (
       <div className="grid grid-flow-row-dense grid-cols-12 ">
          <Sidebar 
-              show={showSidebar}
-              handleClose={()=>setShowSidebar(false)}
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
             />
-        <div className={`lg:ms-24 lg:relative col-span-12  ${showSidebar && 'hidden'}`}>
-          <Sidebtn
-            onShow={()=>setShowSidebar(!showSidebar)}
+        <div className={`lg:ms-60 lg:relative col-span-12  ${show && 'hidden'}`}>
+          <NavMenu
+            onShow={onShow}
+            page={'New Template'}
           />
-          {/* Navbar */}
-          <div className="flex bg-white border shadow-md  justify-between p-3 lg:px-6">
-            <h3 className="text-xl"> Create Messages Template</h3>
-            <div className="hidden lg:block  justify-around gap-2">  
-            </div>
-          </div>
           {/* Templates */}
           <div className="bg-[#f7f7f7]  flex flex-col items-center  h-full  gap-4 w-full px-6 py-2 lg:px-32 ">
             <div className='flex mb-2 mt-4 justify-start w-full'>

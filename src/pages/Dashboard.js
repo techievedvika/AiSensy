@@ -1,35 +1,66 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
-import { faBolt, faBookOpen, faCalendarDays, faCheck, faChevronDown, faChevronUp, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faBookOpen, faCalendar, faCalendarDays, faCheck, faChevronDown, faChevronUp, faComments, faNoteSticky, faPlay, faRocket, faTicket, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
+import { faAddressBook, faArrowRightFromBracket, faBorderAll, faBoxesStacked, faCommentDots, faEnvelopesBulk, faGear, faHeadphones, faMessage, faMoneyBills, faMoneyCheck, faObjectGroup, faTableColumns, faToggleOn, faUsers } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
-import PhoneInput from 'react-phone-number-input';
 import Sidebtn from '../components/Sidebtn';
+import NavMenu from '../components/NavMenu';
+import authService from '../service/authService';
+import httpReq from '../service/httpReq';
 
-const Dashboard = () => {
-    const[showApiDetails,setShowApiDetails]=useState(true); //Toggle whatsapp Business APi button
-    const[showPhoneDetails,setShowPhoneDetails]=useState(false); //Toggle Phone annd Display Name Verification button
-    const[showfbDetails,setShowfbDetails]=useState(false);//Toggle facebook Manager Verification button
-    const[showProfileDetails,setShowProfileDetails]=useState(false); // Setup profile button toggle
-    const[showGreenTickDetails,setShowGreentick]=useState(false); // Toggle green tick button
-    const[showSteps,setShowSteps]=useState(false); // Toggle steps button
-    const[showTutorials,setShowtutorials]=useState(false);
-    const[showSidebar,setShowSidebar]=useState(false);
-	const [phone,setPhoneValue]=useState();
+const Dashboard = (props) => {
+    let {onClose,onShow,show,lgScreen}=props;
+    //console.log(props);
+    // const[showApiDetails,setShowApiDetails]=useState(true); //Toggle whatsapp Business APi button
+    // const[showPhoneDetails,setShowPhoneDetails]=useState(false); //Toggle Phone annd Display Name Verification button
+    // const[showfbDetails,setShowfbDetails]=useState(false);//Toggle facebook Manager Verification button
+    // const[showProfileDetails,setShowProfileDetails]=useState(false); // Setup profile button toggle
+    // const[showGreenTickDetails,setShowGreentick]=useState(false); // Toggle green tick button
+    // const[showSteps,setShowSteps]=useState(false); // Toggle steps button
+    // const[showTutorials,setShowtutorials]=useState(false);
+
+    const[data,setData]=useState({})
+   
+    const user = authService.getUser()
+
+    const fetchData = async()=>{
+      try{
+          let response = await httpReq.get(`/${user._id}/stats`);
+          console.log(response);
+          if(response.status===201){
+            setData(response.data);
+          }
+      }catch(err){
+        console.log(err);
+      }
+    }
+   useEffect(()=>{
+    fetchData();
+   },[]);
     return (
     <>
-      <div className="grid relative grid-cols-12 ">
+      <div className="grid  grid-flow-row-dense grid-cols-12 ">
+     
             <Sidebar 
-              show={showSidebar}
-              handleClose={()=>setShowSidebar(false)}
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
             />
-        <div className={`lg:col-span-11 lg:absolute lg:ms-24 col-span-12 border ${showSidebar && 'hidden'}`}>
-          <Sidebtn
-            onShow={()=>setShowSidebar(!showSidebar)}
+     
+            
+        <div className={`lg:ms-60 lg:relative col-span-12 border ${show && 'hidden'} `}>
+          <NavMenu
+              onShow={onShow}
+              page={'Dashboard'}
           />
+          {/* <Sidebtn
+            onShow={onShow}
+          />
+       */}
           {/* NAVBAR */}
-          <div className="flex flex-col gap-3 lg:flex-row lg:justify-between p-4">
+          {/* <div className="flex flex-col gap-3 lg:flex-row lg:justify-between p-4">
             <h5 className="">Vedvika Tech</h5>
             <div>
               <span>WABA Status : </span>
@@ -46,22 +77,142 @@ const Dashboard = () => {
               </button>
             </div>
             <div></div>
-          </div>
-          <div className="bg-[#f7f7f7] lg:p-6 p-3 lg:grid lg:grid-flow-row-dense grid-cols-3">
+          </div> */}
+          <div className="bg-[#f7f7f7] lg:p-6 w-full  p-3 flex justify-center">
             {/* Left Container */}
-			<div className="lg:col-span-2 flex flex-col items-center gap-4">
-              <div className="flex flex-col gap-3 lg:flex-row lg:justify-between p-4">
-                <h5 className="text-start">Hey User, Welcome to AiSensy!</h5>
-                <div className="flex flex-col lg:flex-row justify-start content-start items-start">
+	            <div className=" w-full pb-24 ">
+              <div className="flex justify-center  my-4 text-center gap-3  p-4">
+                <h5 className="text-center">Hey {user.name}, Welcome to AiSensy!</h5>
+                {/* <div className="flex flex-col lg:flex-row justify-start content-start items-start">
                   <button className="p-2  text-[14px] hover:bg-[#f0f0f0] rounded-lg">
                     <FontAwesomeIcon icon={faPlay} /> Onboarding Video
                   </button>
                   <button className="p-2  text-[14px] hover:bg-[#f0f0f0] rounded-lg">
                     <FontAwesomeIcon icon={faBolt} /> Start Tour
                   </button>
-                </div>
+                </div> */}
               </div>
-              <div className="flex flex-col justify-start content-start items-start text-white bg-[#600e7d] lg:px-16 px-6 py-6 rounded-lg ">
+              <div className='flex flex-wrap justify-center my-2 gap-5 w-full'>
+            <div className='rounded-md bg-white shadow-md my-2 px-12 py-5 '>
+                <div className='flex justify-between gap-10 '>
+                  <h4 className='font-bold text-2xl me-14 lg:me-24'>
+                  {data?.contacts || '0'}
+                  </h4>
+                  <div className='bg-[#0a474c] rounded-full h-10 w-10 text-center'>
+                    <FontAwesomeIcon 
+                    className='text-white text-lg translate-y-2' 
+                    icon={faAddressBook} 
+                    style={{color:'white'}}
+
+                    />
+                  </div>
+                </div>
+                <h5 className='text-gray-500 font-thin my-4'>Total Contacts</h5>
+            </div>
+            <div className='rounded-md bg-white shadow-md my-2 px-12 py-5 '>
+                <div className='flex justify-between gap-10 '>
+                  <h4 className='font-bold text-2xl me-10 lg:me-24'>
+                  {data?.groups || '0'}
+                  </h4>
+                  <div className='bg-[#0a474c] rounded-full h-10 w-10 text-center'>
+                    <FontAwesomeIcon 
+                    className='text-white text-lg translate-y-2' 
+                    icon={faUserGroup} 
+                    style={{color:'white'}}
+
+
+                    />
+                  </div>
+                </div>
+                <h5 className='text-gray-500 font-thin my-4'>
+                Total Contact Groups
+                </h5>
+            </div>
+            <div className='rounded-md bg-white shadow-md my-2 px-12 py-5 '>
+                <div className='flex justify-between gap-10 '>
+                  <h4 className='font-bold text-2xl me-10 lg:me-24'>
+                  {data?.mesaages || '0'}
+                  </h4>
+                  <div className='bg-[#0a474c] rounded-full h-10 w-10 text-center'>
+                    <FontAwesomeIcon 
+                    className='text-white text-lg translate-y-2' 
+                    icon={faRocket} />
+                  </div>
+                </div>
+                <h5 className='text-gray-500 font-thin my-4'>
+                Sent Messages
+                </h5>
+            </div>
+            <div className='rounded-md bg-white shadow-md my-2 px-12 py-5 '>
+                <div className='flex justify-between gap-10 '>
+                  <h4 className='font-bold text-2xl me-10 lg:me-24'>
+                  {data?.bulkmessages || '0'}
+                  </h4>
+                  <div className='bg-[#0a474c] rounded-full h-10 w-10 text-center'>
+                    <FontAwesomeIcon 
+                    className='text-white text-lg translate-y-2' 
+                    icon={faComments} />
+                  </div>
+                </div>
+                <h5 className='text-gray-500 font-thin my-4'>
+                Bulk Messages
+                </h5>
+            </div>
+            <div className='rounded-md bg-white shadow-md my-2 px-12 py-5 '>
+                <div className='flex justify-between gap-10 '>
+                  <h4 className='font-bold text-2xl me-10 lg:me-24'>
+                  {data?.schedules || '0'}
+                  </h4>
+                  <div className='bg-[#0a474c] rounded-full h-10 w-10 text-center'>
+                    <FontAwesomeIcon 
+                    className='text-white text-lg translate-y-2' 
+                    icon={faCalendar} />
+                  </div>
+                </div>
+                <h5 className='text-gray-500 font-thin my-4'>
+                Scheduled Messages
+                </h5>
+            </div>
+            <div className='rounded-md bg-white shadow-md my-2  px-12 py-5 '>
+                <div className='flex justify-between gap-10 '>
+                  <h4 className='font-bold text-2xl me-10 lg:me-24'>
+                  {data?.templates || '0'}
+                  </h4>
+                  <div className='bg-[#0a474c] rounded-full h-10 w-10 text-center'>
+                    <FontAwesomeIcon 
+                    className='text-white text-lg translate-y-2' 
+                    icon={faNoteSticky} />
+                  </div>
+                </div>
+                <h5 className='text-gray-500 font-thin my-4'>
+                Templates
+                </h5>
+            </div>
+            <div className='rounded-md bg-white shadow-md my-2  px-12 py-5 '>
+                <div className='flex justify-between gap-10 '>
+                  <h4 className='font-bold text-2xl me-10 lg:me-24'>
+                  {data?.tickets || '0'}
+                  </h4>
+                  <div className='bg-[#0a474c] rounded-full h-10 w-10 text-center'>
+                    <FontAwesomeIcon 
+                    className='text-white text-lg translate-y-2' 
+                    icon={faTicket} />
+                  </div>
+                </div>
+                <h5 className='text-gray-500 font-thin my-4'>
+                Support Tickets
+                </h5>
+            </div>
+            
+           
+            
+          </div>
+
+
+
+
+
+              {/* <div className="flex flex-col justify-start content-start items-start text-white bg-[#600e7d] lg:px-16 px-6 py-6 rounded-lg ">
                 <h5 className="font-bold text-lg tracking-tight">
                   Start WhatsApp Engagement for your Business
                 </h5>
@@ -96,9 +247,9 @@ const Dashboard = () => {
                   </span>
                   <span>Schedule Live Demo</span>
                 </button>
-              </div>
+              </div> */}
               {/* Conversation Credits */}
-              <div className="bg-[#02545a] w-full  rounded-lg text-white">
+              {/* <div className="bg-[#02545a] w-full  rounded-lg text-white">
                 <div className="flex justify-between px-4 mx-6 py-3 my-2 gap-8">
                   <h6 className="text-xs">
                     Complete the steps & win 200 WhatsApp Conversation Credits
@@ -107,7 +258,7 @@ const Dashboard = () => {
                 </div>
                 <hr className="text-white h-5" />
                 <div className=" px-4 mx-6 py-3 ">
-                    {/* STEP 1 */}
+                    
                   <div className="flex justify-between">
                     <div>
                       <img src="" />
@@ -122,7 +273,7 @@ const Dashboard = () => {
                         <div className='h-6 bg-gray-500 w-0.5 flex self-center ms-3 my-1.5'></div>
                     </div>   
                   </div>
-                    {/* STEP 2 */}
+                
                     <div className="flex justify-between">
                         <div>
                         <img src="" />
@@ -137,7 +288,7 @@ const Dashboard = () => {
                             <div className='h-6 bg-gray-500 w-0.5 flex self-center ms-3 my-1.5'></div>
                         </div>   
                     </div>
-                    {/* STEP 3 */}
+                  
                     <div className="flex justify-between">
                         <div>
                         <img src="" />
@@ -152,7 +303,7 @@ const Dashboard = () => {
                             <div className='h-6 bg-gray-500 w-0.5 flex self-center ms-3 my-1.5'></div>
                         </div>   
                     </div>
-                    {/* STEP 4 */}
+                   
                     <div className="flex justify-between">
                         <div>
                         <img src="" />
@@ -167,7 +318,7 @@ const Dashboard = () => {
                             <div className='h-6 bg-gray-500 w-0.5 flex self-center ms-3 my-1.5'></div>
                         </div>   
                     </div>
-                    {/* STEP 5 */}
+                 
                     <div className="flex justify-between opacity-55">
                         <div>
                         <img src="" />
@@ -181,8 +332,8 @@ const Dashboard = () => {
                             <img alt='img' className='max-h-6' src='https://www.app.aisensy.com/static/media/reward_pending.a6850ee0e6aa7b1fb03679dfa416bfd9.svg'/>
                         </div>   
                     </div>
-                </div>
-                <div className='w-full flex px-2 text-sm rounded-b-md py-3 justify-between text-white bg-[#007e60]'>
+                </div> */}
+                {/* <div className='w-full flex px-2 text-sm rounded-b-md py-3 justify-between text-white bg-[#007e60]'>
                     <p className='text-[10px] max-w-60'>
                     Your WhatsApp Conversation Credits have been sent to your WCC account
                     </p>
@@ -190,9 +341,9 @@ const Dashboard = () => {
                     <FontAwesomeIcon className='me-1' icon={faCheck} style={{color: "#eceff3",}} />
                         Thank You</button>
                 </div>
-              </div>
+              </div> */}
               {/* WhatsApp Business Account */}
-                <div className="bg-white border rounded-lg w-full lg:px-16 px-6 py-6">
+                {/* <div className="bg-white border rounded-lg w-full lg:px-16 px-6 py-6">
                   <div className="flex mx-16 lg:my-3 lg:gap-12 flex-col lg:flex-row lg:justify-between">
                     <div className="text-lg flex font-medium">
                       <img
@@ -204,7 +355,7 @@ const Dashboard = () => {
                     </div>
                     <h5 className=" text-gray-700 text-sm m-2">5 steps left</h5>
                   </div>
-                  {/* Whatsapp business api */}
+                  
                   <div className="bg-[#ebf5f3] p-4 px-8">
                     <h5 className="text-gray-900 font-medium">START</h5>
                     <button
@@ -220,7 +371,7 @@ const Dashboard = () => {
                         className="hidden rounded-full p-1 border-gray-500 border lg:block"
                       />
                     </button>
-                    {/* Show Details when button is clicked */}
+                    
                     {showApiDetails && (
                       <div className='py-5'>
                         <h5 className="text-md my-2 text-[#0a474c]">
@@ -249,10 +400,10 @@ const Dashboard = () => {
                       </div>
                     )}
                   </div>
-                  {/* Remaining Steps */}
+                 
                   {showSteps && (
                     <>
-                      {/* Phone & Display Name Verification */}
+                     
                       <div className="my-3 shadow-sm p-4 px-8 border rounded-md">
                         <button onClick={()=>setShowPhoneDetails(!showPhoneDetails)} className="flex text-slate-800 font-semibold">
                           Phone & Display Name Verification
@@ -291,7 +442,7 @@ const Dashboard = () => {
                           </div>
                         )}
                       </div>
-                      {/* Facebook Manager Verification */}
+                     
                       <div className="my-3 shadow-sm p-4 px-8 border rounded-md">
                         <button onClick={()=>setShowfbDetails(!showfbDetails)} className="flex text-slate-800 font-semibold">
                           Facebook Manager Verification
@@ -331,7 +482,7 @@ const Dashboard = () => {
                           </div>
                         )}
                       </div>
-                      {/* Setup Profile */}
+                 
                       <div className="my-3 shadow-sm p-4 px-8 border rounded-md">
                         <button onClick={()=>setShowProfileDetails(!showProfileDetails)} className="flex text-slate-800 font-semibold">
                           Setup Your Profile
@@ -355,12 +506,12 @@ const Dashboard = () => {
                               How to Edit Business Profile?
                               </h5>
                             </Link>
-                            {/* Edit Profile Button */}
+                           
                             <button className=' bg-[#e0e0e0] text-gray-500 rounded-md text-sm my-2 px-2 py-1.5 ' disabled>Edit Profile</button>
                           </div>
                         )}
                       </div>
-                      {/* Apply for Green Tick */}
+                    
                       <div className="my-3 shadow-sm p-4 px-8 border rounded-md">
                         <button onClick={()=>setShowGreentick(!showGreenTickDetails)} className="flex text-slate-800 font-semibold">
                           Apply for Green Tick
@@ -405,14 +556,14 @@ const Dashboard = () => {
                               </h5>
                             </Link>
                             <iframe className='border-2 border-slate-900 rounded-md' width="460" height="150" src="https://www.youtube.com/embed/6I5iprduEEw" title="How to Verify Facebook Business Manager Account for WhatsApp Business API | AiSensy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                            {/* Edit Profile Button */}
+                          
                             <button className=' bg-[#e0e0e0] text-gray-500 rounded-md text-sm my-2 px-2 py-1.5 ' disabled>Apply for Green Tick</button>
                           </div>
                         )}
                       </div>
                     </>
                   )}
-                  {/* Steps toggle button */}
+              
                   <button className='my-2 text-sm text-gray-600' onClick={() => setShowSteps(!showSteps)}>
                     {showSteps ? (
                       <div className='flex'>
@@ -432,9 +583,9 @@ const Dashboard = () => {
                     </div>
                     )}
                   </button>
-                </div>
-                {/* Platform Walkthrough and Tutorials */}
-                <div className="bg-white w-full border rounded-lg min-w-96 lg:px-16 px-6 py-6">
+                </div> */}
+                
+                {/* <div className="bg-white w-full border rounded-lg min-w-96 lg:px-16 px-6 py-6">
                       <h5 className='text-xl'>Platform Walkthrough & Tutorials</h5>
                       <Link
                               className="text-md my-2 mt-4 text-[#0a474c] flex"
@@ -449,7 +600,7 @@ const Dashboard = () => {
                               </h5>
                       </Link>
                       <iframe className='border w-full border-slate-900 h-60 rounded-sm my-5' width="460" height="150" src="https://www.youtube.com/embed/6I5iprduEEw" title="How to Verify Facebook Business Manager Account for WhatsApp Business API | AiSensy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                      {/* Tutorials Toggle */}
+                 
                       <button 
                         className='my-2 text-sm text-gray-600' 
                         onClick={() => setShowtutorials(!showTutorials)}
@@ -474,7 +625,7 @@ const Dashboard = () => {
                       </button>
                       {showTutorials && (
                         <>
-						{/* TEMPLATE */}
+				
 						<div className='py-5 my-3'>  
 							<h5 className="text-lg font-semibold my-3  text-gray-500 ">
                             Template
@@ -504,7 +655,7 @@ const Dashboard = () => {
                               	</h5>
 							</Link>  
 						</div>
-						{/* CAMPAIGN */}
+				
 						<div className='py-5 my-3'>  
 							<h5 className="text-lg font-semibold my-3  text-gray-500 ">
                             Campaign
@@ -528,7 +679,7 @@ const Dashboard = () => {
                               	</h5>
 							</Link>   
 						</div>
-						{/* Live Chat & Attributes */}
+						
                           <div className='py-5 my-3'>  
                             <h5 className="text-lg font-semibold my-3  text-gray-500 ">
                             Live Chat & Attribute
@@ -576,7 +727,7 @@ const Dashboard = () => {
                               	</h5>
 							</Link>
                           </div>
-						  {/* ChatBot and Integration */}
+						 
 						  <div className='py-5 my-3'>  
 							<h5 className="text-lg font-semibold my-3  text-gray-500 ">
                             Chatbot & Integration
@@ -604,9 +755,9 @@ const Dashboard = () => {
                       )}
                 </div>
             </div>
-			{/* Right Container */}
+	
 			<div className='flex flex-col items-center py-8 lg:px-4 '>
-				{/* Account Info */}
+		
 				<div className='w-full border my-3 shadow-md rounded-md p-4 bg-white'>
 					<h4 className='text-md font-medium lg:text-lg'>Account Status : 
 						<span className='text-[#0a474c]'>Test Mode</span>
@@ -615,7 +766,7 @@ const Dashboard = () => {
 					Test mode enables you to explore Broadcasting and Live Chat features of AiSensy before applying for WhatsApp API
 					</p>
 					<h5>Test Business Number : <span className='text-xl text-[#0a474c]'>+918142189823</span></h5>
-					{/* Contact form */}
+					
 					<div>
 						<div className='flex justify-between my-3'>
 							<h5 className='text-lg  lg:text-lg mt-1'>Test Contact</h5>
@@ -639,12 +790,7 @@ const Dashboard = () => {
 								<label>WhatsApp Number</label>
 							</div>
 							<div className='col-span-3'>
-								{/* <PhoneInput
-									country='US'
-									defaultCountry='India'
-									value={phone}
-									onChange={(phone)=>setPhoneValue(phone)}
-								/> */}
+							
 								<input
 								type='text'
 									placeholder='Mobile Number'
@@ -661,7 +807,7 @@ const Dashboard = () => {
 						<button className='my-2 w-full rounded-md py-2 text-center text-white font-semibold bg-green-500 hover:bg-green-600'>FREE WhatsApp Business API</button>
 					</div>
 				</div>
-				{/* Credits */}
+			
 				<div className='w-full my-3 border shadow-md rounded-md p-4 bg-white'>
 					<div className='flex justify-between font-medium'>
 						<h5>Free Service Conversation</h5>
@@ -682,7 +828,7 @@ const Dashboard = () => {
                            <button className='rounded-md p-2 text-sm text-white bg-[#0a474c] text-center font-medium'>Buy Now</button>     
                     </div>
 				</div>
-                {/* Plan Details */}
+              
                 <div className='w-full my-3 border shadow-md rounded-md p-4 bg-white'>
                     <div className='flex justify-between'>
                         <div>
@@ -696,7 +842,8 @@ const Dashboard = () => {
                         <button className='text-white font- text-center rounded-md px-10 py-2 my-4 w-80 bg-purple-800 hover:bg-purple-900'>Upgrade Now</button>
                     </div>
                 </div>
-			</div>
+			</div> */}
+      </div>
           </div>
         </div>
       </div>

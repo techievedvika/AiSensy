@@ -14,8 +14,14 @@ const CreateGroupModal = ({onClose,open}) => {
     const postData = async(url,obj)=>{
         try{
             let response = await httpReq.post(url,obj);
-            setErrs({})
-            alert(response.data);
+            //console.log(response);
+            if(response.status===201){
+                alert(response.data);
+                setErrs({});
+                onClose();
+            }
+           
+           
         }catch(err){
             console.log(err);
             if(err.response.status===400){
@@ -27,8 +33,9 @@ const CreateGroupModal = ({onClose,open}) => {
     }
     const handleSubmit = (e)=>{
         //e.preventDefault();
-        console.log(user,name);
+        //console.log(user,name);
         postData(`/groups/${user._id}`,{name:name});
+        
     }
     return (
         <>

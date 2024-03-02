@@ -1,14 +1,31 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const schedule = require('node-schedule');
 const upload = multer();
 const{
     User,Contact,
     Message,Group,
     Template,SubsPlan,
-    Ticket,Image
+    Ticket,Image,
+    Chats,BulkMessage,
+    Schedule
 } = require('../models/schema');
 const router = express.Router();
+
+const tokenUserMap = {};
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'vedvikapc1@gmail.com',
+      pass: 'pogr enau qjat etwh'
+    }
+  });
+
+const resetForm = '<div><h3>Reset your password</h3></div>';
 
 //Get all users
 router.get('/users',async(req,res)=>{
@@ -62,7 +79,7 @@ router.post('/register',async(req,res)=>{
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         const newUser = await User.create({...req.body,password:hashedPassword});
-        return res.json({id:newUser._id,email:newUser.email,role:newUser.role});
+        return res.json({id:newUser._id,email:newUser.email,role:newUser.role,name:newUser.name});
     }catch(err){
         return res.status(404).send(err);
     }
@@ -75,7 +92,7 @@ router.post('/login',async(req,res)=>{
         if(user){
             const matchPass = await bcrypt.compare(password,user.password);
             if(matchPass){
-                return res.status(201).json({email:user.email,_id:user._id,role:user.role});
+                return res.status(201).json({email:user.email,_id:user._id,role:user.role,name:user.name});
             }
         }
         return res.status(401).send('Incorrect Username or password');
@@ -83,6 +100,44 @@ router.post('/login',async(req,res)=>{
         return res.status(404).send(err);
     }
 });
+//reset password
+router.post('/resetpassword',async(req,res)=>{
+    try{
+        let {email}=req.body;
+        //check if email is registered
+        const findUser = await User.findOne({email});
+        if(findUser){
+            const token = crypto.randomBytes(8).toString('hex');
+            const mailOptions = {
+              from: 'vedvikapc1@gmail.com',
+              to: email,
+              subject: 'Password Reset',
+              text: `This is your temporary password. You can change it later: ${token}`
+            };
+            transporter.sendMail(mailOptions, async(error, info) => {
+              if (error) {
+                console.error('Error sending email:', error);
+                return res.status(500).send('Error sending email');
+              } else {
+                console.log('Email sent:', info.response);
+                    try {
+                        const updatedUser = await changePassword(token, findUser);
+                        return res.status(200).send('Password reset email sent');
+                    } catch (err) {
+                        console.error('Error changing password:', err);
+                        return res.status(500).send('Error changing password');
+                    }
+              }
+            });
+        }else{
+
+            return res.status(404).json({message:'User with this email does not exist!'});
+        }
+    }catch(err){
+        return res.status(404).send(err);
+    }
+});
+
 //fetch user by id 
 router.get('/getuser/:id',async(req,res)=>{
     try{
@@ -200,21 +255,30 @@ router.post('/user/:id/contacts',async(req,res)=>{
     }
 });
 //fetch contacts of a user
-router.get('/user/:id/contacts',async(req,res)=>{
-    try{
-        let {id} = req.params;
-        const contacts = await Contact.find({addedBy:id});
-        if(contacts.length>0){
-            return res.status(200).json(contacts)
-        }else{
-            return res.status(400).json({message:'No Contacts Found!!'})
+router.get('/user/:id/contacts', async (req, res) => {
+    try {
+        let { id } = req.params;
+        const contacts = await Contact.find({ addedBy: id });
+
+        if (contacts.length > 0) {
+            const contactsWithGroups = await Promise.all(contacts.map(async (contact) => {
+                const groupArr = await Promise.all(contact.groups.map(async (groupId) => {
+                    const group = await Group.findById(groupId);
+                    return group;
+                }));
+               const validGroups = groupArr.filter(group => group !== null);
+               contact.groups = validGroups;
+               return contact;
+            }));
+
+            return res.status(200).json(contactsWithGroups);
+        } else {
+            return res.status(400).json({ message: 'No Contacts Found!!' });
         }
-      
-    
-    }catch(err){
+    } catch (err) {
         res.status(404).send(err);
     }
-})
+});
 //fetch Contact By Id
 router.get('/contact/:id',async(req,res)=>{
     try{
@@ -355,7 +419,7 @@ router.delete('/groups/:id',async(req,res)=>{
         if(!group){
             return res.status(400).send({message:"Group Not Found!!"});
         }
-        const contactsUpdate = group.members || [];
+        const contactsUpdate = group.members?.map(member => member._id) || [];
         await Contact.updateMany(
             { _id: { $in: contactsUpdate } },
             { $pull: { groups: id } }
@@ -520,4 +584,134 @@ router.put('/admin/ticket/:id',async(req,res)=>{
         return res.status(404).send(err);
     }
 })
+
+//user chats
+router.get('/chats/:id',async(req,res)=>{
+    try{
+        let {id}=req.params;
+        const chats = await Chats.find({user:id});
+        return res.status(200).json(chats);
+    }catch(err){
+        return res.status(404).send(err);
+    }
+})
+//add a chat
+router.post('/user/chats',async(req,res)=>{
+    try{
+        
+        const chat = await Chats.create(req.body);
+        if(chat){
+
+            return res.status(200).json(chat);
+        }
+    }catch(err){
+        return res.status(404).send(err);
+    }
+})
+//bulk messages of user
+router.get('/bulkmessages/:id',async(req,res)=>{
+    try{
+        let{id}=req.params;
+        const msgs = await BulkMessage.find({sender:id});
+        return res.status(200).json(msgs);
+    }catch(err){
+        return res.status(404).send(err);
+    }
+});
+//add bulk messages
+router.post('/bulkmessages',async(req,res)=>{
+    try{
+        let {msgs}=req.body;
+        console.log(msgs);
+        for(let m of msgs){
+            let newMsg = {...m,status:'sent'};
+            await BulkMessage.create(newMsg);
+        }
+        return res.status(200).send('Messages saved!!');
+    }catch(err){
+        return res.status(400).send(err);
+    }
+})
+//fetch scheduled messages
+router.get('/schedules/:id',async(req,res)=>{
+    try{
+        let{id}=req.params;
+        const schedules = await Schedule.find({ sender: id }).populate('receiver');
+
+        if (schedules.length > 0) {
+            // Map over schedules and extract receiver's name
+            const msgWithReceiver = schedules.map(msg => {
+                const receiverName = msg.receiver ? msg.receiver.name : 'Unknown';
+                return { ...msg.toObject(), receiver: receiverName };
+            });
+
+            return res.status(200).json(msgWithReceiver);
+        } else {
+            return res.status(404).json({ message: 'No schedules found for the sender' });
+        }
+       
+    }catch(err){
+        return res.status(400).send(err);
+    }
+})
+//schedule a message
+router.post('/schedule',async(req,res)=>{
+    try{
+      
+        let {scheduleAt,sender,receiver,text}=req.body;
+        let newSchedule = await Schedule.create(req.body);
+        let msg = {sender,receiver,text};
+        const scheduledDate = new Date(scheduleAt);
+        const job = schedule.scheduleJob(scheduledDate, async() => {
+            try{
+                let updated = await Schedule.findByIdAndUpdate(newSchedule._id,{status:'sent'},{new:true});
+                if(updated){
+                    console.log('Scheduled!!');
+                }
+            }catch(err){
+                return res.status(400).send(err);
+            } 
+        });
+        return res.status(200).json({ message: 'Message scheduled successfully' });
+
+    }catch(err){
+        console.log(err);
+        return res.status(400).send(err);
+    }
+})
+router.get('/:id/stats',async(req,res)=>{
+    try{
+        let {id}=req.params;
+        let contacts = await Contact.find({addedBy:id});
+        let groups = await Group.find({creator:id});
+        let messages = await Message.find({sender:id});
+        let templates =await Template.find({user:id});
+        let bulkmessages=await BulkMessage.find({sender:id});
+        let schedules = await Schedule.find({sender:id});
+        let tickets = await Ticket.find({user:id});
+        let stats = {
+            contacts:contacts.length,
+            groups:groups.length,
+            messages:messages.length,
+            templates:templates.length,
+            schedules:schedules.length,
+            bulkmessages:bulkmessages.length,
+            tickets:tickets.length
+        };
+        res.status(201).json(stats);
+    }catch(err){
+        return res.status(400).send(err);
+    }
+})
+const changePassword = async(newpassword,user)=>{
+    try{
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newpassword, saltRounds);
+        user.password = hashedPassword;
+        await user.save();
+        return user;
+    }catch(err){
+        throw err;
+    }
+}
 module.exports = router;

@@ -53,10 +53,13 @@ const LoginForm = () => {
           />
        </div>
        <div className="">
-        <button onClick={()=>handleSubmit()} disabled={!form.email || !form.password} className={`w-full rounded-lg text-white font-semibold py-2 text-lg bg-[#0a474c] disabled:bg-[#e0e0e0] disabled:text-gray-400 `}>Continue</button>
+        <button 
+          type='submit'
+          onClick={()=>handleSubmit()} 
+          disabled={!form.email || !form.password} className={`w-full rounded-lg text-white font-semibold py-2 text-lg bg-[#0a474c] disabled:bg-[#e0e0e0] disabled:text-gray-400 `}>Continue</button>
        </div>
        <div className=' text-sm my-3 text-center text-blue-600'>
-       <Link to='/' >Forgot Password?</Link>
+       <Link to='/reset-password' >Forgot Password?</Link>
        </div>
       
     </div>

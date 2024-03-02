@@ -8,8 +8,9 @@ import httpReq from '../service/httpReq'
 import { Link } from 'react-router-dom'
 import { faSlack } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import NavMenu from '../components/NavMenu'
 
-const Messages = () => {
+const Messages = ({show,onShow,onClose,lgScreen}) => {
   const[msgType,setMsgType]=useState('plain');
   const user = authService.getUser();
   const[form,setForm]=useState({
@@ -19,7 +20,6 @@ const Messages = () => {
     sender:user ? user._id :''
   });
   const[errors,setErrors]=useState({});
-  const[showSidebar,setShowSidebar]=useState(false);
   const [contacts,setContacts]=useState([]);
   const fetchContacts = async()=>{
     try{
@@ -87,19 +87,15 @@ const handleSubmit = ()=>{
   return (
     <div className="grid grid-flow-row-dense grid-cols-12 ">
         <Sidebar 
-              show={showSidebar}
-              handleClose={()=>setShowSidebar(false)}
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
             />
-      <div className={`lg:relative lg:ms-24 col-span-12 border ${showSidebar && 'hidden'}`}>
-            <Sidebtn
-            onShow={()=>setShowSidebar(!showSidebar)}
-            />
-        {/* Navbar */}
-        <div className="flex bg-white border shadow-md  justify-between p-3 lg:px-6">
-          <h3 className="text-xl"> Custom Messages</h3>
-          <div className="hidden lg:block  justify-around gap-2">  
-          </div>
-        </div>
+      <div className={`lg:relative lg:ms-60 col-span-12 border ${show && 'hidden'}`}>
+        <NavMenu
+            onShow={onShow}
+            page={'Custom Message'}
+          />
        
         {/* Messages */}
         <div className="bg-[#f7f7f7]  flex flex-col justify-center h-full  gap-4 w-full p-6 lg:px-32 ">
@@ -111,11 +107,11 @@ const handleSubmit = ()=>{
         </div>
         <div className='bg-white lg:grid grid-cols-7 gap-8  rounded-md shadow-lg border  w-full mb-12 p-5 px-8'>
             <div className='lg:col-span-2 flex flex-row lg:flex-col gap-3   p-4 px-8 '>
-              <button onClick={()=>setMsgType('plain')}  className={`${msgType==='plain' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Plain Text</button>
-              <button onClick={()=>setMsgType('with media')}  className={`${msgType==='with media' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md  text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Text With Media</button>
-              <button onClick={()=>setMsgType('with button')}  className={`${msgType==='with button' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md  text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Message With Button</button>
-              <button onClick={()=>setMsgType('list')}  className={`${msgType==='list' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md  text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>List Message</button>
-              <button onClick={()=>setMsgType('location')}  className={`${msgType==='location' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md  text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Send Location</button>
+              <button onClick={()=>setMsgType('plain')}  className={`${msgType==='plain' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md lg:p-1 p-2 text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Plain Text</button>
+              <button onClick={()=>setMsgType('with media')}  className={`${msgType==='with media' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md lg:p-1 p-2  text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Text With Media</button>
+              <button onClick={()=>setMsgType('with button')}  className={`${msgType==='with button' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md lg:p-1 p-2 text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Message With Button</button>
+              <button onClick={()=>setMsgType('list')}  className={`${msgType==='list' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md  text-sm border lg:p-1 p-2 hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>List Message</button>
+              <button onClick={()=>setMsgType('location')}  className={`${msgType==='location' ? 'bg-[#0a474c] text-white' :'bg-white'} shadow-md lg:p-1 p-2  text-sm border hover:bg-[#0a474c]  hover:text-white rounded-md py-1.5`}>Send Location</button>
             </div>
             <div className='lg:col-span-5 p-4'>
               <div className='grid grid-cols-2'>

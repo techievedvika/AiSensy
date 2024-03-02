@@ -10,7 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { DialogContent, DialogContentText } from '@mui/material'
 
 
-const UserTickets = () => {
+const UserTickets = ({show,onShow,onClose,lgScreen}) => {
     const[showSidebar,setShowSidebar]=useState(false);
     const [data,setData]=useState([]);
     const user = authService.getUser();
@@ -71,12 +71,13 @@ const UserTickets = () => {
   return (
       <div className="grid relative grid-flow-row-dense grid-cols-12 ">
           <Sidebar 
-              show={showSidebar}
-              handleClose={()=>setShowSidebar(false)}
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
             />
-           <div className={` lg:relative lg:ms-24 col-span-12 border ${showSidebar && 'hidden'}`}>
+           <div className={` lg:relative lg:ms-60 col-span-12 border ${show && 'hidden'}`}>
             <Sidebtn
-            onShow={()=>setShowSidebar(!showSidebar)}
+            onShow={onShow}
             />
               {/* Navbar */}
               <div className="flex  bg-white border shadow-md  justify-between p-3 lg:px-6">

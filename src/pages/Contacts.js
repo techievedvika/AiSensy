@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
-import { faBars, faBookOpen, faChevronCircleDown, faCircleExclamation, faMagnifyingGlass, faPlay, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faBookOpen, faChevronCircleDown, faCircleExclamation, faMagnifyingGlass, faPenToSquare, faPlay, faPlus, faSort, faTrash, faTrashCan, faUserGroup, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import FilterForm from '../components/FilterForm'
@@ -17,77 +17,98 @@ import MenuItem from '@mui/material/MenuItem';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 
-const Contacts = () => {
-    const[searchText,setSearchText]=useState('');
+import ExportCSV from '../components/ExportCSV'
+import Pagination from '../components/Pagination'
+import NavMenu from '../components/NavMenu'
+
+const Contacts = (props) => {
+    let {show,onShow,onClose,lgScreen} = props;
     const [action,setAction]=useState('');
-    const[entries,setEntries]=useState('25 per page');
     const[showModal,setShowModal]=useState(false);
     const [showFormModal,setShowFormModal] = useState(false);
-    const[showSidebar,setShowSidebar]=useState(false);
     const[showAModal,setShowAModal] =useState('')
     const[data,setData]=useState([]);
     const[edit,setEdit]=useState('');
-    const[contactAction,setcAction]=useState('');
     const [showDeleteM,setShowDeleteM]=useState(false);
-    const [confirmDelete,setConfirmDelete] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleClick = (e,id) => {
+        setAnchorEl(e.currentTarget);
+        setAction(id);
     };
-    const actions=['Export','Import History','Manage Tags','block & Opt','Edit Contact'];
-    const entriesArr = ['25 per page','50 per page','100 per page'];
+    const entriesArr = [25,50,100];
     const user = authService.getUser();
+    const [ogData,setogData] = useState([]);
+    const [currentPage, setCurrentPage] = React.useState(0);
+    const [itemsPerPage,setItemsPerPage] = useState(25);
+    const totalPages = Math.ceil(data.length / (+itemsPerPage));
+    const startIndex = currentPage * (+itemsPerPage);
+    const endIndex = Math.min(startIndex + (+itemsPerPage), data.length);
+    let paginatedData = data.slice(startIndex, endIndex);
+     
+
+  const nextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
     //fetch contacts Data
     const fetchData =async()=>{
       try{
-        let response=await httpReq.get(`/user/${user._id}/contacts`);
-        //console.log(response.data);
+        let response=await httpReq.get(`/user/${user?._id}/contacts`);
+       
         if(response.status===200){
           setData(response.data);
+          console.log(response.data);
+          setogData(response.data);
         }
       }catch(err){
-        console.log(err);
+         console.log(err);
         
       }
     }
+    
     useEffect(()=>{
       fetchData();
+     
       if(!showFormModal){
         setEdit('');
-        
       }
       if(showFormModal){
         setShowAModal('');
       }
       
-    },[ showFormModal, edit]);
+    },[ startIndex,showFormModal, edit]);
     //Search Contacts by name or mobile number
-    const handleSearch = ()=>{
-      let contacts = [...data];
-      let c1 = contacts.filter((a)=>{
-        if(a.name.includes(searchText) || (a.mobile.includes(searchText))){
-          return a;
-        }
-        return;
-      });
-      setData(c1);
+    const handleSearch = (e) => {
+      const inputValue = e.target.value.trim(); 
+      if (inputValue === '') {
+          setData(ogData); 
+      } else {
+          const filteredContacts = ogData.filter((contact) => {
+              return contact.name.toLowerCase().includes(inputValue.toLowerCase()) || contact.mobile.includes(inputValue);
+          });
+          setData(filteredContacts);
+      }
     }
     //Remove a contact
     const removeData = async(url)=>{
       try{
         let response = await httpReq.deleteApi(url);
-        console.log(response);
+        // console.log(response);
         if(response.status===200){
           setShowDeleteM(false);
           fetchData();
         }
       }catch(err){
-        console.log(err)
+        // console.log(err)
       }
     }
     //Edit a Contact
     const handleEdit =(id)=>{
+       console.log(id);
       setEdit(id);
       handleClose();
       setShowFormModal(true);
@@ -101,28 +122,34 @@ const Contacts = () => {
     const handleRemove = ()=>{
       removeData(`/contact/${showDeleteM}`);
     }  
-    const handleAction = (id)=>{
-      if(id===showAModal){
-        setShowAModal('');
-      }else{
-        setShowAModal(id);
-      }
-    }
     const handleClose = () => {
       setAnchorEl(null);
     };
+    const sortBy = (str)=>{
+      let sortedData = [...data];
+      sortedData.sort((a, b) => a[str].localeCompare(b[str]));
+      setData(sortedData);
+      setCurrentPage(0);
+    }
+    //console.log('Total Pages',totalPages);
+    //console.log('Current Pages',currentPage);
     return (
     <div className="grid grid-flow-row-dense grid-cols-12 w-full ">
             <Sidebar 
-              show={showSidebar}
-              handleClose={()=>setShowSidebar(false)}
+              show={show}
+              handleClose={onClose}
+              lgScreen={lgScreen}
             />
-      <div className={`lg:relative lg:ms-24 col-span-12 ${(showModal || showFormModal) && ' opacity-15'}  ${showSidebar && 'hidden'}`}>
-          <Sidebtn
-            onShow={()=>setShowSidebar(!showSidebar)}
+      <div className={`lg:relative lg:ms-60 col-span-12 ${(showModal || showFormModal) && ' opacity-15'}  ${show && 'hidden'}`}>
+          {/* <Sidebtn
+            onShow={onShow}
+          /> */}
+          <NavMenu
+            onShow={onShow}
+            page={'Contacts'}
           />
         {/* NAVBAR */}
-        <div className="flex bg-white border shadow-md  justify-between p-3 lg:px-6">
+        {/* <div className="flex bg-white border shadow-md  justify-between py-3 lg:px-6">
           <h3 className="text-xl">Contacts</h3>
           <div className="hidden lg:block  justify-around gap-2">
             <span className="text-xs text-gray-500 mx-2">
@@ -146,10 +173,10 @@ const Contacts = () => {
             </span>
             <span>2</span>
           </div>
-        </div>
-        <div className="bg-[#f7f7f7] flex justify-center flex-col gap-4 w-full py-6 lg:px-32 ">
+        </div> */}
+        <div className="bg-[#f7f7f7] flex justify-center flex-col gap-4 w-full py-6 lg:px-10 px-4">
           {/* Quick Guide */}
-          <div className="bg-white border shadow-md rounded-md p-6 py-6 w-full">
+          {/* <div className="bg-white border shadow-md rounded-md p-6 py-6 w-full">
             <h5>Quick Guide</h5>
             <h6 className="text-gray-500  my-2">
               Import contact, create audience & launch campaign, all from one
@@ -164,93 +191,118 @@ const Contacts = () => {
             <button className="p-2 my-3 text-[#0a474c] hover:bg-[#f0f0f0] rounded-lg">
                     <FontAwesomeIcon icon={faPlay} /> Watch Tutorial
             </button>
-          </div>
+          </div> */}
           {/* Search and Filter */}
-          <div className="p-6 py-6 w-full flex flex-col gap-3 lg:gap-1 lg:flex-row justify-between">
+          <div className="p-6 py-6 w-full flex flex-col gap-3 lg:gap-1 lg:flex-row lg:justify-between justify-center ">
             <div className='flex'>
                 {/* Searchbar */}
                 <div>
                     <input
                         type='text'
-                        value={searchText}
-                        placeholder='Search name or mobile number'
-                        className='rounded border-none px-3 focus:border-none text-gray-500 focus:bg-white min-w-60  placeholder:text-sm placeholder:tracking-tight py-1.5 bg-[#f0f0f0]'
-                        onChange={(e)=>setSearchText(e.target.value)}
+                        placeholder='Search by name or mobile number'
+                        className='rounded border px-3 focus:border-none text-gray-500 focus:bg-white min-w-80  placeholder:tracking-tight py-2 bg-[#f0f0f0] '
+                        onChange={handleSearch}
                     />
-                    <button onClick={()=>handleSearch()}>
+                    <button >
                       <FontAwesomeIcon 
                       className='text-[#0a474c] text-sm rounded-full -translate-x-6'
                       icon={faMagnifyingGlass} />
                     </button>
                 </div>
-                {/* Filter Modal Toggle */}
-                <button onClick={()=>setShowModal(true)} className='bg-white px-3 py-2 text-[#0a474c] rounded-sm hover:bg-[#f0f0f0]'>
-                    <FontAwesomeIcon className='px-3' icon={faBars} />
-                    Filter
-                </button>
+                
             </div>
             <div className='flex gap-2'>
-                {/* Broadcast */}
-                <button className='bg-[#d9d9d9] rounded-md  text-gray-600 text-sm p-1.5 opacity-65' disabled>BROADCAST</button>
+
                 {/* Add Contact */}
-                <button onClick={()=>setShowFormModal(true)} className='border border-gray-400 text-gray-700 text-sm p-2 rounded-lg px-3 opacity-65'>+ Add Contact</button>
+                <button onClick={()=>setShowFormModal(true)} className='bg-white px-2 p-1 text-center  text-gray-500 font-medium hover:bg-[#0a474c] hover:text-white border border-gray-400 rounded-lg'>
+                <FontAwesomeIcon icon={faPlus} />
+                </button>
                 {/* Import */}
-                <Link to ='/group' 
-                    className='bg-white p-2 text-center text-sm text-gray-500 font-medium hover:bg-[#0a474c] hover:text-white border border-gray-400 rounded-lg'
-                >
-                   Contact Groups
-                </Link>
-                {/* Actions */}
-                <select
-                    onChange={(e)=>setAction(e.target.value)}
-                    className='border text-[#0a474c] hover:bg-[#edf0f0] border-[#809fa1] hover:border-[#0a474c] py-1 text-center text-sm rounded-lg'
-                >
-                    <option>Actions</option>
-                    {actions.map((a)=>(
-                        <option>{a}</option>
-                    ))}
-                </select>
+                <button  className='bg-white px-2 p-1 text-center text-gray-500 font-medium hover:bg-[#0a474c] hover:text-white border border-gray-400 rounded-lg'>
+                  <Link to ='/group' 
+                     
+                  >
+                    <FontAwesomeIcon icon={faUserGroup} />
+                  </Link>
+                </button>
+                <ExportCSV
+                  data={data}
+                />
+                <div>
+                    <select
+                        className='bg-white px-2 p-2 text-sm text-center text-gray-500 font-medium border border-gray-400 rounded-lg focus:border-none '
+                        value={itemsPerPage}
+                        onChange={(e)=>setItemsPerPage(e.target.value)}
+                    >
+                        {entriesArr.map((a)=>(
+                            <option key={a} value={a}>{a} per page</option>
+                        ))}
+                    </select>
+                </div>
             </div>
           </div>
           
           {/* Contacts Container */}
-          <div className=' mb-4 border  overflow-scroll  border-gray-400 bg-white   rounded-lg shadow-sm '>
-            <table className=''>
-                <tr className='bg-white  px-6 py-3 flex  font-medium text-slate-900 f'>
-                    <td className=' min-w-48 col-span-2 py-3'>
-                        <input
+          <div className=' mb-4 border overflow-scroll   bg-white   rounded-lg shadow-sm '>
+            <table className=' '>
+                <tr className='bg-white font-sans text-center uppercase border  flex font-medium text-slate-900 text-sm'>
+                    <td className=' min-w-48 border-r  col-span-2 py-3 font-serif '>
+                        {/* <input
                             type='checkbox'
                             className='rounded-md border-2 w-6 h-4 translate-y-1 mx-2 border-gray-800 bg-[#0a474c] checked:bg-[#0a474c]'
                         />
-                        Name
+                        Name */} Name
+                        <button onClick={()=>sortBy('name')}>
+                        <FontAwesomeIcon className='ms-1.5 text-lg' icon={faSort} />
+                        </button>
                     </td>
-                    <td className=' min-w-48 col-span-2 py-3'>Mobile </td>
-                    <td className=' min-w-48 col-span-2 py-3'>Status</td>
-                    <td className=' min-w-48 col-span-2 py-3'>Groups</td>               
-                    <td className=' min-w-48 col-span-2 py-3'>Action</td>               
+                    <td className=' min-w-48 border-r  col-span-2 py-3'>
+                        Mobile
+                        <button onClick={()=>sortBy('mobile')}>
+                        <FontAwesomeIcon className='ms-1.5 text-lg' icon={faSort} />
+                        </button>
+                     </td>
+                    <td className=' min-w-48 border-r  col-span-2 py-3'>Status
+                    <button onClick={()=>sortBy('status')}>
+                        <FontAwesomeIcon className='ms-1.5 text-lg' icon={faSort} />
+                        </button>
+                    </td>
+                    <td className=' min-w-48 border-r  col-span-2 py-3'>Groups</td>               
+                    <td className=' min-w-48 border-r  col-span-2 py-3'>Action</td>               
           
                 </tr>
                 {/* Contacts Data */}
-                <div className='min-h-60'>
-                      {data.length>0 && data.map((a,ind)=>(
+                <div className='min-h-80 font-sans max-h-[400px]'>
+                      {paginatedData.length>0 &&  paginatedData.map((a,ind)=>{
+                      
+                        return (
                         <>
-
-                        <tr key={ind} className='bg-white w-full flex px-6 py-3  font-normal text-slate-900'>
-                          <td className='col-span-2 min-w-48'>{a.name}</td>
-                          <td className='col-span-2 min-w-48'>{a.mobile}</td>
-                          <td className='col-span-2 min-w-48'>{a.status}</td>
-                          <td className='col-span-2 min-w-48'></td>
-                          <td className='col-span-2 min-w-48'>
-                               
-                                <button
+                        <tr key={ind} className='bg-white w-full flex   font-normal text-slate-900'>
+                          <td className='col-span-2 border p-1.5 text-center min-w-48'>{a.name} </td>
+                          <td className='col-span-2 border p-1.5 text-center min-w-48'>{a.mobile}</td>
+                          <td className='col-span-2 border p-1.5 text-center min-w-48'>{a.status}</td>
+                          <td
+                            title={a.groups.map((b) => b.name).join(', ')} 
+                            className='col-span-2 hover:whitespace-normal hover:z-1 border p-1.5 text-center w-48 text-sm truncate'
+                          >
+                            {a.groups.map((b) => b.name).join(', ')} 
+                          </td>
+                          <td className='col-span-2 border p-1.5 text-center min-w-48'>
+                              <button onClick={()=>handleEdit(a._id)} className='mx-2'>
+                                <FontAwesomeIcon icon={faPenToSquare} />
+                              </button>
+                              <button onClick={()=>handleDelete(a._id)} className='mx-2'>
+                                <FontAwesomeIcon icon={faTrashCan} />
+                              </button>
+                                {/* <button
                                     id="basic-button"
                                     className='text-xs border p-1 font-semibold rounded-lg px-1.5'
                                     aria-controls={open ? 'basic-menu' : undefined}
                                     aria-haspopup="true"
                                     aria-expanded={open ? 'true' : undefined}
-                                    onClick={handleClick}
+                                    onClick={(e)=>handleClick(e,a._id)}
                                 >
-                                Action
+                                Action 
                                 <FontAwesomeIcon className='ps-1 text-xs' icon={faChevronCircleDown}/>
                                 </button>
                                 <Menu
@@ -263,41 +315,35 @@ const Contacts = () => {
                                     'aria-labelledby': 'basic-button',
                                     }}
                                 >
-                                    <MenuItem className=' text-xs hover:text-[#0a474c]' onClick={()=>handleEdit(a._id)}>
-                                        Edit
+                                    <MenuItem className=' text-xs hover:text-[#0a474c]' onClick={()=>handleEdit(action)}>
+                                        Edit 
                                     </MenuItem>
-                                    <MenuItem className=' hover:text-[#0a474c]' onClick={()=>handleDelete(a._id)}>Delete</MenuItem>
-                                </Menu>
-                             
+                                    <MenuItem className=' hover:text-[#0a474c]' onClick={()=>handleDelete(action)}>Delete</MenuItem>
+                                </Menu> */}
                           </td>
                         </tr>
                         </>
-                      ))}
+                      )})}
                 </div>
             </table>
           </div>
-        
+          <div>
+            <Pagination
+              currentPage={currentPage}
+              itemsPerPage={itemsPerPage}
+              totalPages={totalPages}
+              handleChange={(e)=>setItemsPerPage(e.target.value)}
+              prevPage={prevPage}
+              nextPage={nextPage}
+            />
+          </div>
           </div> 
           {/* Footer */} 
           <div className='border  m-0 py-4  bg-white shadow-lg flex justify-center'>
             <div className='flex gap-4'>
-                <div>
-                    <button className='text-gray-500 font-semibold text-lg'>{`<`}</button>
-                    <span className='mx-3'>1-0 of 0</span>
-                    <button className='text-gray-500 font-semibold text-lg'>{`>`}</button>
-                </div>
-                {/* Number of Entries */}
-                <div>
-                    <select
-                        className='text-gray-500 text-sm border-none focus:border-none selection:bg-[#f7f7f7]'
-                        value={entries}
-                        onChange={(e)=>setEntries(e.target.value)}
-                    >
-                        {entriesArr.map((a)=>(
-                            <option value={a}>{a}</option>
-                        ))}
-                    </select>
-                </div>
+               
+                
+                
             </div>
           </div>
           
@@ -321,7 +367,7 @@ const Contacts = () => {
         {showFormModal && (
           <div className='relative col-span-12'>
             <ContactForm
-            open={showFormModal}
+              open={showFormModal}
               onClose={()=>setShowFormModal(false)}
               editId = {edit}
             />
